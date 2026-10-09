@@ -138,3 +138,15 @@ describe('Supabase', () => {
     expect((await nube.cargarDatos('luna')).ajustes.nombreEnReporte).toBe('RENTALALUNA');
   });
 });
+
+describe('patrones de productos', () => {
+  it('los productos guardados reciben los patrones nuevos sin perder los tuyos', async () => {
+    const repo = await localLimpio();
+    const d = await repo.cargarDatos(TIENDA_PRINCIPAL.id);
+    const enc = d.productos.find((p) => p.id === 'encendedor')!;
+    await repo.guardar(TIENDA_PRINCIPAL.id, 'productos', { ...enc, patrones: ['ENC(?!HIN)\\w*D\\w*R', 'MIO'] });
+    const despues = (await repo.cargarDatos(TIENDA_PRINCIPAL.id)).productos.find((p) => p.id === 'encendedor')!;
+    expect(despues.patrones).toContain('MIO');
+    expect(despues.patrones).toContain('ENF\\w*DOR');
+  });
+});

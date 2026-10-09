@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clasificar, parseReportText } from '@/features/reportes/parseReport';
+import { clasificar, parseReportText, separarPiezas } from '@/features/reportes/parseReport';
 import { productosIniciales } from '@/domain/defaults';
 import { reporteCompleto, reporteParcial } from '@/test/fixture';
 
@@ -53,5 +53,30 @@ describe('parseReportText', () => {
 
   it('rechaza un PDF que no es un reporte', () => {
     expect(() => parseReportText('Factura número 123', productos)).toThrow();
+  });
+});
+
+describe('variaciones reales del formato', () => {
+  const productos = productosIniciales();
+
+  it('encuentra la tabla aunque la primera celda del encabezado no diga TIENDA', () => {
+    const r = parseReportText(reporteCompleto.replace('TIENDA FECHA PRODUCTO', 'Hh FECHA PRODUCTO'), productos);
+    expect(r.avisos).toEqual([]);
+    expect(r.pedidosEntregados).toBe(6);
+    expect(Object.values(r.piezas).reduce((a, b) => a + b, 0)).toBeGreaterThan(0);
+  });
+
+  it('no confunde un código postal con la cantidad de piezas', () => {
+    const piezas = separarPiezas(
+      'SOPORTE BOCINA BLUETHOOT Av. Siempre Viva 123, Centro, 64770 Monterrey, N.L.',
+      productos,
+    );
+    expect(piezas).toEqual([{ productoId: 'bocina', cantidad: 1, texto: expect.any(String) }]);
+  });
+
+  it('reconoce el encendedor aunque venga mal escrito', () => {
+    expect(clasificar('2 ENFENDEDORNELECTRONICO', productos)).toBe('encendedor');
+    expect(clasificar('ENXENDEDOR', productos)).toBe('encendedor');
+    expect(clasificar('ENCHINADOR ELECTRONICO', productos)).toBeNull();
   });
 });

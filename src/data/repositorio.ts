@@ -59,6 +59,12 @@ export function normalizarDatos(
       sembrar.productos = productos;
     }
   }
+  // Los productos de Gatito reciben los patrones nuevos de cada versión (sin perder los que agregaste tú).
+  const base = new Map(productosIniciales().map((p) => [p.id, p]));
+  productos = productos.map((p) => {
+    const d = base.get(p.id);
+    return d ? { ...p, patrones: [...new Set([...p.patrones, ...d.patrones])] } : p;
+  });
   const orden = new Map(productosIniciales().map((p, i) => [p.id, i]));
   productos.sort((a, b) => (orden.get(a.id) ?? 99) - (orden.get(b.id) ?? 99));
   return {

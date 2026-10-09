@@ -48,7 +48,7 @@ export const productosIniciales = (): Producto[] => [
   {
     id: 'encendedor',
     nombre: 'Encendedor electrónico',
-    patrones: ['ENC(?!HIN)\\w*D\\w*R', 'ENX\\w*DOR'],
+    patrones: ['ENC(?!HIN)\\w*D\\w*R', 'ENX\\w*DOR', 'ENF\\w*DOR'],
     costoUnitario: 30.28,
     porCaja: true,
     piezasPorCaja: 200,

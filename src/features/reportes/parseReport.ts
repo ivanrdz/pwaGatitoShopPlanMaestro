@@ -51,12 +51,13 @@ export function separarPiezas(texto: string, productos: Producto[]): Pieza[] {
     .filter(Boolean);
   const piezas: Pieza[] = [];
   partes.forEach((parte, i) => {
-    const m = /^(\d+)\s/.exec(parte);
+    // Cantidad de 1 o 2 dígitos: un número más largo es un código postal o un número de casa.
+    const m = /^(\d{1,2})\s/.exec(parte);
     const cantidad = m ? Number(m[1]) : 1;
     const productoId = clasificar(parte, productos);
     // Las partes sin producto que no empiezan con número suelen ser parte del nombre del cliente.
     if (!productoId && i > 0 && !m) return;
-    const sinCantidad = parte.replace(/^\d+\s+/, '');
+    const sinCantidad = parte.replace(/^\d{1,2}\s+/, '');
     // Solo guardamos las dos primeras palabras: así no se guardan datos del cliente.
     const corto = sinCantidad.split(/\s+/).slice(0, 2).join(' ');
     piezas.push({ productoId, cantidad, texto: corto });
@@ -74,7 +75,10 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
   const texto = raw.replace(/\s+/g, ' ').trim();
   const avisos: string[] = [];
 
-  const corte = texto.search(/TIENDA\s+FECHA\s+PRODUCTO/i);
+  // Inicio de la tabla de pedidos. La primera celda suele decir TIENDA, pero a veces la editan ("Hh"),
+  // así que se reconoce por las columnas FECHA PRODUCTO CLIENTE y se incluye la palabra anterior.
+  const columnas = texto.search(/\bFECHA\s+PRODUCTO\s+CLIENTE\b/i);
+  const corte = columnas > 0 ? texto.lastIndexOf(' ', columnas - 2) + 1 : columnas;
   const encabezado = corte >= 0 ? texto.slice(0, corte) : texto;
   const cuerpo = corte >= 0 ? texto.slice(corte) : '';
 
