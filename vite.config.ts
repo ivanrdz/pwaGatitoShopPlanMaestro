@@ -41,7 +41,7 @@ export default defineConfig({
       thresholds: {
         'src/domain/**': { lines: 80, branches: 75 },
         'src/data/**': { lines: 85, branches: 85 },
-        'src/features/indicadores/*.ts': { lines: 90 },
+        'src/features/indicadores/calculo*.ts': { lines: 90 },
       },
     },
   },

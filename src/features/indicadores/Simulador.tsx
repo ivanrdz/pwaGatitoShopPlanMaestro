@@ -6,7 +6,7 @@ import {
   simular,
   type Escenario,
   type Resultado,
-} from '@/features/indicadores/simulador';
+} from '@/features/indicadores/calculoSimulador';
 import { CampoNumero } from '@/shared/ui/Campo';
 import { dinero, entero } from '@/shared/lib/format';
 

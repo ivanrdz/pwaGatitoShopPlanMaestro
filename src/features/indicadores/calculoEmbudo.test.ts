@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { calcularEmbudo, enviosParaMeta, escenarioEntrega, proyectarEnvios } from '@/features/indicadores/embudo';
+import {
+  calcularEmbudo,
+  enviosParaMeta,
+  escenarioEntrega,
+  proyectarEnvios,
+} from '@/features/indicadores/calculoEmbudo';
 import { ajustesIniciales, productosIniciales } from '@/domain/defaults';
 import { ESTATUS, type Datos, type Reporte } from '@/domain/types';
 

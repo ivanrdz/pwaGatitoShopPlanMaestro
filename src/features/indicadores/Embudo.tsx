@@ -7,7 +7,7 @@ import {
   escenarioEntrega,
   proyectarEnvios,
   utilidadPorEnvioEscalada,
-} from '@/features/indicadores/embudo';
+} from '@/features/indicadores/calculoEmbudo';
 import { CampoNumero } from '@/shared/ui/Campo';
 import { dinero, entero, rangoSemana } from '@/shared/lib/format';
 

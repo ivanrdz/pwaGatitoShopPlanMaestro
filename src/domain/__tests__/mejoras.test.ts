@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { calcularLibro } from '@/domain/finance';
 import { reemplazosPorProducto } from '@/domain/series';
-import { baseSimulacion, escenarioActual, simular } from '@/features/indicadores/simulador';
+import { baseSimulacion, escenarioActual, simular } from '@/features/indicadores/calculoSimulador';
 import { parseReportText } from '@/features/reportes/parseReport';
 import { ajustesIniciales, productosIniciales } from '@/domain/defaults';
 import { ESTATUS, type Datos, type Reporte } from '@/domain/types';
