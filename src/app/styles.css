@@ -162,6 +162,9 @@ p {
 .marca {
   display: none;
 }
+.cuenta-lateral {
+  display: none;
+}
 
 @media (min-width: 720px) {
   .marco {
@@ -175,6 +178,25 @@ p {
     border-top: 0;
     border-right: 1px solid var(--linea);
     padding: 28px 14px;
+    display: flex;
+    flex-direction: column;
+  }
+  .cuenta-lateral {
+    margin-top: auto;
+    display: grid;
+    gap: 4px;
+    padding: 14px 12px 0;
+    border-top: 1px solid var(--linea);
+    font-size: 0.85rem;
+  }
+  .cuenta-correo {
+    color: var(--tenue);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cuenta-lateral .enlace {
+    justify-self: start;
   }
   .marca {
     display: flex;
