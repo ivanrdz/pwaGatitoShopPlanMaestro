@@ -15,8 +15,11 @@ export interface Pago {
   dias: number;
   efectivo: number;
   pedidos: number;
+  /** Piezas vendidas por producto. */
   piezas: Record<string, number>;
-  /** Lo que costaron las piezas de caja que se vendieron. */
+  /** Piezas que salieron de tu inventario (sin las que cobró el proveedor). */
+  piezasStock: Record<string, number>;
+  /** Lo que costaron las piezas de caja que salieron de tu inventario. */
   reposicion: number;
   banco: number;
   fondoInventario: number;
@@ -131,6 +134,7 @@ export function pagosDeReportes(reportes: Reporte[]) {
         efectivo: parcial.efectivo,
         pedidos: parcial.pedidosEntregados,
         piezas: { ...parcial.piezas },
+        piezasStock: piezasDeStock(parcial),
       });
     }
     if (completo) {
@@ -146,10 +150,16 @@ export function pagosDeReportes(reportes: Reporte[]) {
         efectivo: completo.efectivo - (parcial?.efectivo ?? 0),
         pedidos: completo.pedidosEntregados - (parcial?.pedidosEntregados ?? 0),
         piezas: parcial ? restar(completo.piezas, parcial.piezas) : { ...completo.piezas },
+        piezasStock: parcial ? restar(piezasDeStock(completo), piezasDeStock(parcial)) : piezasDeStock(completo),
       });
     }
   }
   return salida;
+}
+
+/** Piezas que salieron de tu inventario: las vendidas menos las que cobró el proveedor. */
+export function piezasDeStock(r: Pick<Reporte, 'piezas' | 'piezasProveedor'>): Record<string, number> {
+  return r.piezasProveedor ? restar(r.piezas, r.piezasProveedor) : { ...r.piezas };
 }
 
 export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
@@ -197,7 +207,7 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
     const p = ev.pago;
     const previo = p.fecha < arranque;
     const snap = p.reporte.snapshot;
-    const reposicion = Object.entries(p.piezas).reduce((s, [id, n]) => {
+    const reposicion = Object.entries(p.piezasStock).reduce((s, [id, n]) => {
       const prod = productoPorId.get(id);
       return prod?.porCaja ? s + n * prod.costoUnitario : s;
     }, 0);
@@ -257,9 +267,9 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
         (s, c) => s + c.items.filter((i) => i.productoId === producto.id).reduce((a, i) => a + i.piezas, 0),
         0,
       );
-      const salidas = pagos.filter((p) => p.desde >= desde).reduce((s, p) => s + (p.piezas[producto.id] ?? 0), 0);
+      const salidas = pagos.filter((p) => p.desde >= desde).reduce((s, p) => s + (p.piezasStock[producto.id] ?? 0), 0);
       const stock = producto.stockInicial + entradas - salidas;
-      const porDia = ultimas.reduce((s, p) => s + (p.piezas[producto.id] ?? 0), 0) / diasMuestra;
+      const porDia = ultimas.reduce((s, p) => s + (p.piezasStock[producto.id] ?? 0), 0) / diasMuestra;
       const capturado = producto.stockInicial > 0 || entradas > 0;
       const espera = (producto.diasEntrega ?? 7) + (ajustes.diasColchon ?? 0);
       const puntoPedido = Math.max(producto.puntoReorden, Math.ceil(porDia * espera));

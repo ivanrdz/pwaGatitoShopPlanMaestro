@@ -80,3 +80,41 @@ describe('variaciones reales del formato', () => {
     expect(clasificar('ENCHINADOR ELECTRONICO', productos)).toBeNull();
   });
 });
+
+describe('piezas que cobró el proveedor', () => {
+  const productos = productosIniciales();
+  const reporte = (filas: string) =>
+    reporteCompleto.replace(
+      /(TIENDA FECHA PRODUCTO CLIENTE PRECIO STATUS ENVIO COMENTARIO COSTO)[\s\S]*$/,
+      `$1\n${filas}`,
+    );
+
+  it('si el pedido trae costo, las piezas de caja no salen de tu inventario', () => {
+    const r = parseReportText(
+      reporte(`GATITOSHOP 28/9/2026 2 ENCENDEDORES ELECTRONICOS Cliente A / 8100000001 / Calle 1 $229 OK $69 94
+GATITOSHOP 28/9/2026 SOPORTE BOCINA BLUETHOOT Cliente B / 8100000002 / Calle 2 $229 OK $59`),
+      productos,
+    );
+    expect(r.piezas).toMatchObject({ encendedor: 2, bocina: 1 });
+    expect(r.piezasProveedor).toEqual({ encendedor: 2 });
+  });
+
+  it('el costo del foco no marca como cobrado al soporte del mismo pedido', () => {
+    const r = parseReportText(
+      reporte(
+        `GATITOSHOP 28/9/2026 SOPORTE BOCINA BLUETHOOT Y FOCO BOCINA Cliente A / 8100000001 / Calle 1 $399 OK $59 54`,
+      ),
+      productos,
+    );
+    expect(r.piezas).toMatchObject({ bocina: 1, foco: 1 });
+    expect(r.piezasProveedor).toEqual({});
+  });
+
+  it('un número de piezas en el comentario no se toma como costo', () => {
+    const r = parseReportText(
+      reporte(`GATITOSHOP 28/9/2026 4 ENCENDEDORES ELECTRONICOS Cliente A / 8100000001 / Calle 1 $229 OK $59 2 PZZ`),
+      productos,
+    );
+    expect(r.piezasProveedor).toEqual({});
+  });
+});

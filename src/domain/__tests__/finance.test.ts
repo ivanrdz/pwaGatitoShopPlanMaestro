@@ -118,4 +118,28 @@ describe('kpisPorSemana', () => {
     expect(k.costoPorPedido).toBe(42);
     expect(k.roas).toBeCloseTo(15000 / 4200);
   });
+
+  it('las piezas que cobró el proveedor no se le deben al banco ni salen del inventario', () => {
+    const r = { ...reporte('completo', 5000, { bocina: 10 }, 20), piezasProveedor: { bocina: 4 } };
+    const libro = calcularLibro(
+      datos({
+        compras: [
+          {
+            id: 'c1',
+            fecha: '2026-09-01',
+            financiadoPor: 'banco',
+            items: [{ productoId: 'bocina', piezas: 100, costo: 5000 }],
+            guia: 0,
+            premio: 0.15,
+          },
+        ],
+        reportes: [r],
+      }),
+    );
+    const costo = productosIniciales().find((p) => p.id === 'bocina')!.costoUnitario;
+    expect(libro.pagos[0].piezas.bocina).toBe(10);
+    expect(libro.pagos[0].piezasStock.bocina).toBe(6);
+    expect(libro.pagos[0].reposicion).toBeCloseTo(6 * costo);
+    expect(libro.pagos[0].banco).toBeCloseTo(6 * costo * 1.15);
+  });
 });

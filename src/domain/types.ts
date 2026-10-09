@@ -87,6 +87,11 @@ export interface ReporteParseado {
   reemplazos: number;
   /** Piezas enviadas sin cobro (reemplazos), por producto. */
   reemplazosPorProducto: Record<string, number>;
+  /**
+   * Piezas de productos de caja que cobró el proveedor en el pedido (como antes de comprar por caja).
+   * No salen de tu inventario ni se le deben al banco. Falta en reportes guardados por versiones anteriores.
+   */
+  piezasProveedor?: Record<string, number>;
   /** Nombre de la tienda que trae el reporte. */
   tienda: string;
   avisos: string[];

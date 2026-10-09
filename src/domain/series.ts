@@ -1,4 +1,4 @@
-import type { Libro, Pago } from '@/domain/finance';
+import { piezasDeStock, type Libro, type Pago } from '@/domain/finance';
 import type { Datos } from '@/domain/types';
 import { diaMes } from '@/shared/lib/format';
 
@@ -149,7 +149,8 @@ export function kpisPorSemana(datos: Datos): KpiSemana[] {
         e['SIN STOCK'].pedidos +
         e['FUERA DE COBERTURA'].pedidos;
       const piezas = Object.values(r.piezas).reduce((s, n) => s + n, 0);
-      const reposicion = Object.entries(r.piezas).reduce((s, [id, n]) => s + n * (costo.get(id) ?? 0), 0);
+      // Solo cuesta reponer lo que salió de tu inventario; lo que cobró el proveedor ya viene restado del efectivo.
+      const reposicion = Object.entries(piezasDeStock(r)).reduce((s, [id, n]) => s + n * (costo.get(id) ?? 0), 0);
       const publicidad = r.snapshot.gastoDiarioPublicidad * dias;
       const fijos = (r.snapshot.fijosMensual * dias) / 30;
       const utilidad = r.efectivo - reposicion - publicidad - fijos;

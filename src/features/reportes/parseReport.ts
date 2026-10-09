@@ -4,6 +4,8 @@ import { isoDate, sumarDias } from '@/shared/lib/format';
 const DIA_RE =
   /(LUNES|MARTES|MI[ÉE]RCOLES|JUEVES|VIERNES|S[ÁA]BADO)\s+(\d{1,2})\/(\d{1,2})\/(\d{4})\s+([\d,]+)(?![\d,/])\s+([\d,]+)(?![\d,/])/gi;
 const PRECIO_ESTATUS_RE = /\$\s?([\d,]+)\s+(OK|REAGENDO|CANCELO|REPETIDO|SIN STOCK|SIN SERVICIO|FUERA DE COBERTURA)\b/i;
+/** Costo que cobra el proveedor en el pedido: el número que va justo después del envío ("$69 94"). */
+const COSTO_FILA_RE = /^\s*(?:\$\s?[\d,]+|N\/A)\s+(\d+(?:\.\d+)?)(?![\d.,]|\s*(?:PZ|PIEZA))/i;
 const SOLO_RE = /SOLO\s+(?:PIDIO\s+)?(\d+)|(\d+)\s*PZZ/i;
 
 const numero = (s: string | undefined) => Number((s ?? '').replace(/[$,\s]/g, '')) || 0;
@@ -143,6 +145,8 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
   const noReconocidos = new Map<string, number>();
   let reemplazos = 0;
   const reemplazosPorProducto: Record<string, number> = {};
+  const piezasProveedor: Record<string, number> = {};
+  const porId = new Map(productos.map((p) => [p.id, p]));
   let filasOk = 0;
   const filas = [...cuerpo.matchAll(filaRe)];
   filas.forEach((fila, i) => {
@@ -163,6 +167,25 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
     const solo = SOLO_RE.exec(despues);
     const reconocidas = lista.filter((p) => p.productoId);
     if (solo && reconocidas.length === 1) reconocidas[0].cantidad = Number(solo[1] ?? solo[2]);
+
+    // Si el proveedor cobró las piezas de caja en este pedido, no salieron de tu inventario.
+    const costoFila = Number(COSTO_FILA_RE.exec(despues)?.[1] ?? 0);
+    if (costoFila > 0) {
+      let deCaja = 0;
+      let sinCaja = 0;
+      for (const p of reconocidas) {
+        const prod = porId.get(p.productoId!);
+        if (!prod) continue;
+        if (prod.porCaja) deCaja += p.cantidad * prod.costoUnitario;
+        else sinCaja += p.cantidad * prod.costoUnitario;
+      }
+      if (deCaja > 0 && costoFila - sinCaja >= deCaja / 2) {
+        for (const p of reconocidas) {
+          if (porId.get(p.productoId!)?.porCaja)
+            piezasProveedor[p.productoId!] = (piezasProveedor[p.productoId!] ?? 0) + p.cantidad;
+        }
+      }
+    }
 
     for (const p of lista) {
       if (p.productoId && precio === 0) {
@@ -192,6 +215,7 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
     noReconocidos: [...noReconocidos].map(([texto, n]) => ({ texto, piezas: n })),
     reemplazos,
     reemplazosPorProducto,
+    piezasProveedor,
     tienda,
     avisos,
   };
