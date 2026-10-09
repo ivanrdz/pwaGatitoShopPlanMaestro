@@ -63,7 +63,14 @@ export function App() {
                   aria-current={ruta === n.ruta ? 'page' : undefined}
                 >
                   <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-                    <path d={n.icono} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d={n.icono}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                   <span>{n.texto}</span>
                 </a>

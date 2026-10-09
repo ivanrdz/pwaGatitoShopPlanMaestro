@@ -62,11 +62,7 @@ export function Billete({ pago, productos }: { pago: Pago; productos: Producto[]
         aria-label={sobres.map((s) => `${s.titulo}: ${dinero(s.monto)}`).join('. ')}
       >
         {positivos.map((s) => (
-          <span
-            key={s.clave}
-            className={`billete-tramo sobre-${s.clave}`}
-            style={{ flexGrow: s.monto / total }}
-          />
+          <span key={s.clave} className={`billete-tramo sobre-${s.clave}`} style={{ flexGrow: s.monto / total }} />
         ))}
       </div>
       <ul className="sobres">

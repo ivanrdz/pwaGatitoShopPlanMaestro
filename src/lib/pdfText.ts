@@ -1,6 +1,8 @@
 import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
-let pdfjs: typeof import('pdfjs-dist') | null = null;
+import type * as PdfJs from 'pdfjs-dist';
+
+let pdfjs: typeof PdfJs | null = null;
 
 async function cargarPdfjs() {
   if (!pdfjs) {

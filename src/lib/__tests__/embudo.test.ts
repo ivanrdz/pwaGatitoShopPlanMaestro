@@ -3,20 +3,46 @@ import { calcularEmbudo, enviosParaMeta, escenarioEntrega, proyectarEnvios } fro
 import { ajustesIniciales, productosIniciales } from '../defaults';
 import { ESTATUS, type Datos, type Reporte } from '../types';
 
-function rep(lunes: string, tipo: 'parcial' | 'completo', ok: number, otros: Partial<Record<string, number>>, efectivo: number, piezas: Record<string, number>): Reporte {
+function rep(
+  lunes: string,
+  tipo: 'parcial' | 'completo',
+  ok: number,
+  otros: Partial<Record<string, number>>,
+  efectivo: number,
+  piezas: Record<string, number>,
+): Reporte {
   const e = Object.fromEntries(ESTATUS.map((x) => [x, { monto: 0, pedidos: 0 }])) as Reporte['estatus'];
   e.OK.pedidos = ok;
   for (const [k, v] of Object.entries(otros)) e[k as keyof typeof e].pedidos = v ?? 0;
   return {
-    id: `${lunes}-${tipo}`, semana: lunes, etiqueta: '', tipo, ventas: efectivo * 1.3, pedidosEntregados: ok, logistica: ok * 61,
-    costoProducto: 0, efectivo, estatus: e, dias: [], piezas, noReconocidos: [], reemplazos: 0, reemplazosPorProducto: {},
-    tienda: 'GATITOSHOP', nombreArchivo: '', cargadoEn: '',
+    id: `${lunes}-${tipo}`,
+    semana: lunes,
+    etiqueta: '',
+    tipo,
+    ventas: efectivo * 1.3,
+    pedidosEntregados: ok,
+    logistica: ok * 61,
+    costoProducto: 0,
+    efectivo,
+    estatus: e,
+    dias: [],
+    piezas,
+    noReconocidos: [],
+    reemplazos: 0,
+    reemplazosPorProducto: {},
+    tienda: 'GATITOSHOP',
+    nombreArchivo: '',
+    cargadoEn: '',
     snapshot: { gastoDiarioPublicidad: 600, sueldoMensual: 18000, fijosMensual: 1140, premioBanco: 0.15 },
   };
 }
 
 const datos = (reportes: Reporte[]): Datos => ({
-  ajustes: ajustesIniciales(), productos: productosIniciales(), reportes, compras: [], cobros: [],
+  ajustes: ajustesIniciales(),
+  productos: productosIniciales(),
+  reportes,
+  compras: [],
+  cobros: [],
 });
 
 describe('embudo de envíos', () => {
@@ -24,7 +50,14 @@ describe('embudo de envíos', () => {
   const ids = Object.fromEntries(productos.map((p) => [p.nombre.toLowerCase(), p.id]));
   const idEnc = productos.find((p) => /encend/i.test(p.nombre))!.id;
   // Corte real del 5-7 oct: 39 entregados de 69, $7,406.
-  const jueves = rep('2026-10-05', 'parcial', 39, { REAGENDO: 12, CANCELO: 11, 'SIN SERVICIO': 6, 'SIN STOCK': 1, REPETIDO: 4 }, 7406, { [idEnc]: 46 });
+  const jueves = rep(
+    '2026-10-05',
+    'parcial',
+    39,
+    { REAGENDO: 12, CANCELO: 11, 'SIN SERVICIO': 6, 'SIN STOCK': 1, REPETIDO: 4 },
+    7406,
+    { [idEnc]: 46 },
+  );
 
   it('cuenta envíos sin repetidos y calcula el % de entrega', () => {
     const e = calcularEmbudo(datos([jueves]))!;

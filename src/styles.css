@@ -26,7 +26,12 @@
   --radio-chico: 9px;
   --nav-alto: 64px;
 
-  font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    'IBM Plex Sans',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: var(--tinta);

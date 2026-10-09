@@ -57,7 +57,10 @@ export function Inventario({ ir }: { ir: (r: Ruta) => void }) {
       <BarrasApiladas
         titulo="Piezas vendidas por semana"
         descripcion="Úsala para calcular cuándo pedir la siguiente caja."
-        columnas={piezasPorSemana(libro.pagos, libro.inventario.map((e) => e.producto.id))}
+        columnas={piezasPorSemana(
+          libro.pagos,
+          libro.inventario.map((e) => e.producto.id),
+        )}
         series={libro.inventario.map((e, i) => ({
           clave: e.producto.id,
           nombre: e.producto.nombre,
@@ -241,7 +244,11 @@ function NuevaCompra({ alCerrar }: { alCerrar: () => void }) {
           valor={guia}
           min={0}
           alCambiar={setGuiaManual}
-          ayuda={guiaManual === null ? `${dinero(datos.ajustes.guiaCompra)} por caja × ${Math.ceil(totalCajas)} cajas` : undefined}
+          ayuda={
+            guiaManual === null
+              ? `${dinero(datos.ajustes.guiaCompra)} por caja × ${Math.ceil(totalCajas)} cajas`
+              : undefined
+          }
         />
         <CampoTexto etiqueta="Nota" value={nota} alCambiar={setNota} placeholder="Opcional" />
       </div>

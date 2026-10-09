@@ -13,7 +13,12 @@ import { dinero, entero, rangoSemana } from '../lib/format';
 
 const pct = (n: number) => `${(n * 100).toFixed(0)}%`;
 const dineroCentavos = (n: number) =>
-  new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(n);
+  new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency: 'MXN',
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(n);
 
 const PERIODOS = [
   { valor: 4, texto: '4 semanas' },
@@ -43,7 +48,8 @@ export function Embudo() {
   }
 
   const porEnvio = utilidadPorEnvioEscalada(e, encarecimiento);
-  const proyeccion = modo === 'envios' ? proyectarEnvios(e, envios, encarecimiento) : enviosParaMeta(e, meta, encarecimiento);
+  const proyeccion =
+    modo === 'envios' ? proyectarEnvios(e, envios, encarecimiento) : enviosParaMeta(e, meta, encarecimiento);
   const enviosEscenario = modo === 'envios' ? envios : (proyeccion?.envios ?? 100);
   const hoyEscenario = escenarioEntrega(e, enviosEscenario, e.entrega, encarecimiento);
   const noEntregados = MOTIVOS.map((m) => ({ ...m, n: e.noEntregados[m.clave] ?? 0 }))
@@ -63,7 +69,8 @@ export function Embudo() {
           ))}
         </div>
         <p className="tenue">
-          {etiquetaPeriodo}: {rangoSemana(e.semanas[0].semana).split(' – ')[0]} a {rangoSemana(e.semanas.at(-1)!.semana).split(' – ')[1]}
+          {etiquetaPeriodo}: {rangoSemana(e.semanas[0].semana).split(' – ')[0]} a{' '}
+          {rangoSemana(e.semanas.at(-1)!.semana).split(' – ')[1]}
         </p>
       </div>
 
@@ -104,7 +111,8 @@ export function Embudo() {
                 <strong className={`num ${e.utilidad < 0 ? 'negativo' : 'positivo'}`}>{dinero(e.utilidad)}</strong>
               </div>
               <p className="tenue">
-                Efectivo menos producto de caja{conPremio ? ' con premio del banco' : ''}, publicidad y gastos fijos. Antes de tu sueldo.
+                Efectivo menos producto de caja{conPremio ? ' con premio del banco' : ''}, publicidad y gastos fijos.
+                Antes de tu sueldo.
               </p>
             </li>
           </ol>
@@ -166,8 +174,20 @@ export function Embudo() {
               <CampoNumero etiqueta="Envíos que quiero hacer" valor={envios} min={0} alCambiar={setEnvios} />
             ) : (
               <div className="rejilla-campos">
-                <CampoNumero etiqueta="Utilidad que quiero por semana" prefijo="$" valor={meta} min={0} alCambiar={setMeta} />
-                <CampoNumero etiqueta="Días que trabajas por semana" valor={diasOperacion} min={1} max={7} alCambiar={setDiasOperacion} />
+                <CampoNumero
+                  etiqueta="Utilidad que quiero por semana"
+                  prefijo="$"
+                  valor={meta}
+                  min={0}
+                  alCambiar={setMeta}
+                />
+                <CampoNumero
+                  etiqueta="Días que trabajas por semana"
+                  valor={diasOperacion}
+                  min={1}
+                  max={7}
+                  alCambiar={setDiasOperacion}
+                />
               </div>
             )}
             <div className="control-deslizador">
@@ -184,8 +204,9 @@ export function Embudo() {
                 onChange={(ev) => setEncarecimiento(Number(ev.target.value) / 100)}
               />
               <p className="campo-ayuda">
-                Facebook suele cobrar más por conversación al subir mucho el presupuesto. Con +{Math.round(encarecimiento * 100)}%, cada
-                envío te deja {dineroCentavos(porEnvio)} en lugar de {dineroCentavos(e.utilidadPorEnvio)}.
+                Facebook suele cobrar más por conversación al subir mucho el presupuesto. Con +
+                {Math.round(encarecimiento * 100)}%, cada envío te deja {dineroCentavos(porEnvio)} en lugar de{' '}
+                {dineroCentavos(e.utilidadPorEnvio)}.
               </p>
             </div>
           </div>
@@ -216,14 +237,16 @@ export function Embudo() {
                 </article>
                 <article className={`kpi ${modo === 'envios' ? 'kpi-destacado' : ''}`}>
                   <h3>Utilidad esperada</h3>
-                  <p className={`kpi-valor num ${proyeccion.utilidad < 0 ? 'negativo' : ''}`}>{dinero(proyeccion.utilidad)}</p>
+                  <p className={`kpi-valor num ${proyeccion.utilidad < 0 ? 'negativo' : ''}`}>
+                    {dinero(proyeccion.utilidad)}
+                  </p>
                   <p className="tenue">Antes de tu sueldo.</p>
                 </article>
               </div>
             ) : (
               <p className="aviso">
-                Con estos números cada envío no deja utilidad, así que ninguna cantidad de envíos llega a la meta. Baja el
-                encarecimiento o revisa tus costos.
+                Con estos números cada envío no deja utilidad, así que ninguna cantidad de envíos llega a la meta. Baja
+                el encarecimiento o revisa tus costos.
               </p>
             )}
           </div>
@@ -234,8 +257,8 @@ export function Embudo() {
       <section className="seccion" aria-labelledby="ent-titulo">
         <h2 id="ent-titulo">¿Y si se entregan más?</h2>
         <p className="tenue">
-          Mismos {entero(enviosEscenario)} envíos y misma publicidad; solo cambia cuántos se entregan. Cada entrega extra deja
-          efectivo sin costar más anuncios. Es la palanca más barata: no requiere subir el presupuesto.
+          Mismos {entero(enviosEscenario)} envíos y misma publicidad; solo cambia cuántos se entregan. Cada entrega
+          extra deja efectivo sin costar más anuncios. Es la palanca más barata: no requiere subir el presupuesto.
         </p>
         <div className="tabla-scroll">
           <table className="tabla">
@@ -321,8 +344,9 @@ export function Embudo() {
           </table>
         </div>
         <p className="tenue">
-          Un pedido que se reagenda y se entrega otro día cuenta como dos envíos, así que el % de entrega real por cliente es un poco
-          mejor que este. La calculadora usa la misma regla, así que sus resultados siguen cuadrando con tus cortes.
+          Un pedido que se reagenda y se entrega otro día cuenta como dos envíos, así que el % de entrega real por
+          cliente es un poco mejor que este. La calculadora usa la misma regla, así que sus resultados siguen cuadrando
+          con tus cortes.
         </p>
       </section>
     </div>

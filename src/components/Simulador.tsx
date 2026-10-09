@@ -47,12 +47,17 @@ export function Simulador() {
         <h2 id="sim-titulo">¿Qué pasa si…?</h2>
         <p className="tenue">
           Parte de tus últimas {base.semanas} semanas completas: cada pedido entregado te cuesta{' '}
-          {dinero(base.costoPorPedido)} en anuncios y te deja {dinero(base.efectivoPorPedido - base.reposicionPorPedido)}{' '}
-          después de logística y producto.
+          {dinero(base.costoPorPedido)} en anuncios y te deja{' '}
+          {dinero(base.efectivoPorPedido - base.reposicionPorPedido)} después de logística y producto.
         </p>
         <div className="botones">
           {atajos.map((a) => (
-            <button key={a.texto} type="button" className="boton boton-secundario" onClick={() => setEsc({ ...esc, ...a.aplicar })}>
+            <button
+              key={a.texto}
+              type="button"
+              className="boton boton-secundario"
+              onClick={() => setEsc({ ...esc, ...a.aplicar })}
+            >
               {a.texto}
             </button>
           ))}
@@ -87,8 +92,20 @@ export function Simulador() {
           />
         </div>
         <div className="rejilla-campos">
-          <CampoNumero etiqueta="Tu sueldo al mes" prefijo="$" valor={esc.sueldoMensual} min={0} alCambiar={(v) => setEsc({ ...esc, sueldoMensual: v })} />
-          <CampoNumero etiqueta="Gastos fijos al mes" prefijo="$" valor={esc.fijosMensual} min={0} alCambiar={(v) => setEsc({ ...esc, fijosMensual: v })} />
+          <CampoNumero
+            etiqueta="Tu sueldo al mes"
+            prefijo="$"
+            valor={esc.sueldoMensual}
+            min={0}
+            alCambiar={(v) => setEsc({ ...esc, sueldoMensual: v })}
+          />
+          <CampoNumero
+            etiqueta="Gastos fijos al mes"
+            prefijo="$"
+            valor={esc.fijosMensual}
+            min={0}
+            alCambiar={(v) => setEsc({ ...esc, fijosMensual: v })}
+          />
         </div>
         <button type="button" className="enlace" onClick={() => setEsc(escenarioActual(base))}>
           Volver a como estás hoy
@@ -112,7 +129,8 @@ export function Simulador() {
                 const a = f.valor(hoy);
                 const b = f.valor(nuevo);
                 const dif = a !== null && b !== null ? b - a : null;
-                const tono = dif === null || Math.abs(dif) < 0.5 ? '' : (dif > 0) === (f.mejor === 'subir') ? 'bien' : 'mal';
+                const tono =
+                  dif === null || Math.abs(dif) < 0.5 ? '' : dif > 0 === (f.mejor === 'subir') ? 'bien' : 'mal';
                 return (
                   <tr key={f.nombre}>
                     <th scope="row">{f.nombre}</th>

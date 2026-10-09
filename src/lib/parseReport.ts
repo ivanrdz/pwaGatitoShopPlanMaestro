@@ -3,15 +3,17 @@ import { isoDate, sumarDias } from './format';
 
 const DIA_RE =
   /(LUNES|MARTES|MI[ÉE]RCOLES|JUEVES|VIERNES|S[ÁA]BADO)\s+(\d{1,2})\/(\d{1,2})\/(\d{4})\s+([\d,]+)(?![\d,/])\s+([\d,]+)(?![\d,/])/gi;
-const PRECIO_ESTATUS_RE =
-  /\$\s?([\d,]+)\s+(OK|REAGENDO|CANCELO|REPETIDO|SIN STOCK|SIN SERVICIO|FUERA DE COBERTURA)\b/i;
+const PRECIO_ESTATUS_RE = /\$\s?([\d,]+)\s+(OK|REAGENDO|CANCELO|REPETIDO|SIN STOCK|SIN SERVICIO|FUERA DE COBERTURA)\b/i;
 const SOLO_RE = /SOLO\s+(?:PIDIO\s+)?(\d+)|(\d+)\s*PZZ/i;
 
 const numero = (s: string | undefined) => Number((s ?? '').replace(/[$,\s]/g, '')) || 0;
 
 /** Mayúsculas y sin acentos, para comparar con los patrones. */
 export const normalizar = (s: string) =>
-  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+  s
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
 
 const nombreDia = (s: string) => normalizar(s);
 
@@ -141,7 +143,7 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
   const filas = [...cuerpo.matchAll(filaRe)];
   filas.forEach((fila, i) => {
     const inicio = (fila.index ?? 0) + fila[0].length;
-    const fin = i + 1 < filas.length ? filas[i + 1].index ?? cuerpo.length : cuerpo.length;
+    const fin = i + 1 < filas.length ? (filas[i + 1].index ?? cuerpo.length) : cuerpo.length;
     const trozo = cuerpo.slice(inicio, fin);
     const pe = PRECIO_ESTATUS_RE.exec(trozo);
     if (!pe || pe[2].toUpperCase() !== 'OK') return;

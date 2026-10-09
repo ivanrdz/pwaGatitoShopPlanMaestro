@@ -195,7 +195,8 @@ function DetalleReporte({ reporte, alCerrar }: { reporte: Reporte; alCerrar: () 
       {pago && (
         <>
           <h3 className="subtitulo">
-            Cómo se reparte {pago.tipo === 'lunes' ? 'el pago del lunes' : pago.tipo === 'jueves' ? 'el pago del jueves' : 'el pago'}
+            Cómo se reparte{' '}
+            {pago.tipo === 'lunes' ? 'el pago del lunes' : pago.tipo === 'jueves' ? 'el pago del jueves' : 'el pago'}
           </h3>
           <Billete pago={pago} productos={datos.productos} />
         </>

@@ -34,8 +34,8 @@ export function Banco() {
           </div>
         </dl>
         <p className="tenue">
-          Cada pieza de caja que se entrega regresa su costo más el premio. Cuando la deuda llega a cero, ese dinero
-          se queda en Gatito para la siguiente compra.
+          Cada pieza de caja que se entrega regresa su costo más el premio. Cuando la deuda llega a cero, ese dinero se
+          queda en Gatito para la siguiente compra.
         </p>
       </section>
 

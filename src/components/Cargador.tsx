@@ -115,7 +115,11 @@ export function CargadorProvider({ children, alGuardar }: { children: ReactNode;
                 disabled={validos.length === 0 || guardando}
                 onClick={guardar}
               >
-                {guardando ? 'Guardando…' : validos.length > 1 ? `Guardar ${validos.length} reportes` : 'Guardar reporte'}
+                {guardando
+                  ? 'Guardando…'
+                  : validos.length > 1
+                    ? `Guardar ${validos.length} reportes`
+                    : 'Guardar reporte'}
               </button>
             </>
           )
@@ -149,8 +153,8 @@ export function CargadorProvider({ children, alGuardar }: { children: ReactNode;
                       </div>
                       {deOtraTienda(l) && (
                         <p className="error">
-                          Este reporte es de {l.parseado.tienda} y estás en una tienda que usa {tiendaReporte}. Cambia de
-                          tienda para subirlo; no se guardará aquí.
+                          Este reporte es de {l.parseado.tienda} y estás en una tienda que usa {tiendaReporte}. Cambia
+                          de tienda para subirlo; no se guardará aquí.
                         </p>
                       )}
                       {l.parseado.avisos.map((a) => (

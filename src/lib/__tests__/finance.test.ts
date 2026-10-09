@@ -59,7 +59,14 @@ describe('calcularLibro', () => {
     const libro = calcularLibro(
       datos({
         compras: [
-          { id: 'c1', fecha: '2026-09-01', financiadoPor: 'banco', items: [{ productoId: 'bocina', piezas: 100, costo: 1000 }], guia: 0, premio: 0.15 },
+          {
+            id: 'c1',
+            fecha: '2026-09-01',
+            financiadoPor: 'banco',
+            items: [{ productoId: 'bocina', piezas: 100, costo: 1000 }],
+            guia: 0,
+            premio: 0.15,
+          },
         ],
         reportes: [reporte('completo', 20000, { bocina: 25 }, 99)],
       }),
@@ -91,7 +98,10 @@ describe('calcularLibro', () => {
 
   it('los pagos de antes del arranque no mueven saldos', () => {
     const base = datos({ reportes: [reporte('completo', 15000, { bocina: 25 }, 99)] });
-    const libro = calcularLibro({ ...base, ajustes: { ...base.ajustes, inventarioDesde: '2026-10-10', saldoInicialReserva: 500 } });
+    const libro = calcularLibro({
+      ...base,
+      ajustes: { ...base.ajustes, inventarioDesde: '2026-10-10', saldoInicialReserva: 500 },
+    });
     expect(libro.pagos[0].previo).toBe(true);
     expect(libro.sobrePublicidad).toBe(0);
     expect(libro.reserva).toBe(500);

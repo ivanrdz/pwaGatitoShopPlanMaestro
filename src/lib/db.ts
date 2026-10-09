@@ -40,7 +40,10 @@ export function usarTienda(id: string) {
 export async function crearTienda(t: Tienda, nombreEnReporte: string) {
   const db = await abrir(t.id);
   const tx = db.transaction('kv', 'readwrite');
-  tx.objectStore('kv').put({ ...ajustesIniciales(), nombreEnReporte: nombreEnReporte.toUpperCase(), gastosFijos: [] }, 'ajustes');
+  tx.objectStore('kv').put(
+    { ...ajustesIniciales(), nombreEnReporte: nombreEnReporte.toUpperCase(), gastosFijos: [] },
+    'ajustes',
+  );
   await terminar(tx);
 }
 

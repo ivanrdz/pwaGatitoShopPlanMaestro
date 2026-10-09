@@ -41,7 +41,13 @@ export function Ajustes() {
         <h2 id="dinero-titulo">Tu dinero</h2>
         <p className="tenue">Se usan para los reportes que subas de aquí en adelante.</p>
         <div className="rejilla-campos">
-          <CampoNumero etiqueta="Tu sueldo al mes" prefijo="$" valor={a.sueldoMensual} min={0} alCambiar={(v) => setA({ ...a, sueldoMensual: v })} />
+          <CampoNumero
+            etiqueta="Tu sueldo al mes"
+            prefijo="$"
+            valor={a.sueldoMensual}
+            min={0}
+            alCambiar={(v) => setA({ ...a, sueldoMensual: v })}
+          />
           <CampoNumero
             etiqueta="Premio del banco"
             sufijo="%"
@@ -149,7 +155,12 @@ export function Ajustes() {
           <div className="campo">
             <label htmlFor="inv-desde">Llevar las cuentas desde</label>
             <div className="campo-caja">
-              <input id="inv-desde" type="date" value={a.inventarioDesde} onChange={(e) => setA({ ...a, inventarioDesde: e.target.value })} />
+              <input
+                id="inv-desde"
+                type="date"
+                value={a.inventarioDesde}
+                onChange={(e) => setA({ ...a, inventarioDesde: e.target.value })}
+              />
             </div>
           </div>
           <CampoNumero
@@ -231,7 +242,8 @@ export function Ajustes() {
             type="button"
             className="boton boton-peligro"
             onClick={async () => {
-              if (window.confirm('¿Borrar todos los reportes, compras y ajustes de este dispositivo?')) await borrarTodo();
+              if (window.confirm('¿Borrar todos los reportes, compras y ajustes de este dispositivo?'))
+                await borrarTodo();
             }}
           >
             Borrar todo
@@ -284,8 +296,19 @@ function EditorProducto({ producto, alGuardar }: { producto: Producto; alGuardar
         />
         {p.porCaja && (
           <>
-            <CampoNumero etiqueta="Piezas por caja" valor={p.piezasPorCaja} min={0} alCambiar={(v) => setP({ ...p, piezasPorCaja: v })} />
-            <CampoNumero etiqueta="Precio de la caja" prefijo="$" valor={p.precioCaja} min={0} alCambiar={(v) => setP({ ...p, precioCaja: v })} />
+            <CampoNumero
+              etiqueta="Piezas por caja"
+              valor={p.piezasPorCaja}
+              min={0}
+              alCambiar={(v) => setP({ ...p, piezasPorCaja: v })}
+            />
+            <CampoNumero
+              etiqueta="Precio de la caja"
+              prefijo="$"
+              valor={p.precioCaja}
+              min={0}
+              alCambiar={(v) => setP({ ...p, precioCaja: v })}
+            />
             <CampoNumero
               etiqueta="Tu proveedor tarda"
               sufijo="días"
@@ -314,7 +337,15 @@ function EditorProducto({ producto, alGuardar }: { producto: Producto; alGuardar
       <CampoTexto
         etiqueta="Cómo aparece en el reporte"
         value={p.patrones.join(', ')}
-        alCambiar={(v) => setP({ ...p, patrones: v.split(',').map((x) => x.trim()).filter(Boolean) })}
+        alCambiar={(v) =>
+          setP({
+            ...p,
+            patrones: v
+              .split(',')
+              .map((x) => x.trim())
+              .filter(Boolean),
+          })
+        }
       />
       <label className="casilla">
         <input type="checkbox" checked={p.porCaja} onChange={(e) => setP({ ...p, porCaja: e.target.checked })} />
@@ -339,12 +370,17 @@ function SeccionTiendas() {
     <section className="seccion" aria-labelledby="tiendas-titulo">
       <h2 id="tiendas-titulo">Tiendas</h2>
       <p className="tenue">
-        Cada tienda lleva por separado sus reportes, productos, inventario, banco y sobres. Cambia de tienda desde el menú.
+        Cada tienda lleva por separado sus reportes, productos, inventario, banco y sobres. Cambia de tienda desde el
+        menú.
       </p>
       <ul className="tiendas">
         {tiendas.map((t) => (
           <li key={t.id}>
-            <CampoTexto etiqueta={t.id === activa.id ? 'Tienda actual' : 'Tienda'} value={t.nombre} alCambiar={(v) => renombrar(t.id, v)} />
+            <CampoTexto
+              etiqueta={t.id === activa.id ? 'Tienda actual' : 'Tienda'}
+              value={t.nombre}
+              alCambiar={(v) => renombrar(t.id, v)}
+            />
             <div className="botones">
               {t.id !== activa.id && (
                 <button type="button" className="boton boton-secundario" onClick={() => cambiar(t.id)}>

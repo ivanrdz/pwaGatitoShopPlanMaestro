@@ -1,11 +1,4 @@
-export type Estatus =
-  | 'OK'
-  | 'REAGENDO'
-  | 'CANCELO'
-  | 'REPETIDO'
-  | 'SIN STOCK'
-  | 'SIN SERVICIO'
-  | 'FUERA DE COBERTURA';
+export type Estatus = 'OK' | 'REAGENDO' | 'CANCELO' | 'REPETIDO' | 'SIN STOCK' | 'SIN SERVICIO' | 'FUERA DE COBERTURA';
 
 export const ESTATUS: Estatus[] = [
   'OK',

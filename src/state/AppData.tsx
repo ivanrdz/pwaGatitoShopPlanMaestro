@@ -88,7 +88,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       },
       async agregarCompra(c) {
         const { ajustes } = await db.cargarDatos();
-        await db.guardar('compras', { ...c, id: nuevoId(), premio: c.financiadoPor === 'banco' ? ajustes.premioBanco : 0 });
+        await db.guardar('compras', {
+          ...c,
+          id: nuevoId(),
+          premio: c.financiadoPor === 'banco' ? ajustes.premioBanco : 0,
+        });
         await recargar();
       },
       async borrarCompra(id) {

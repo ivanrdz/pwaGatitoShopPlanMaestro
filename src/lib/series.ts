@@ -51,7 +51,11 @@ export function repartoPorSemana(pagos: Pago[], ultimas = 12): Columna[] {
 export function piezasPorSemana(pagos: Pago[], ids: string[], ultimas = 12): Columna[] {
   const mapa = new Map<string, Columna>();
   for (const p of pagos) {
-    const col = mapa.get(p.semana) ?? { etiqueta: diaMes(p.semana), detalle: `Semana del ${diaMes(p.semana)}`, valores: {} };
+    const col = mapa.get(p.semana) ?? {
+      etiqueta: diaMes(p.semana),
+      detalle: `Semana del ${diaMes(p.semana)}`,
+      valores: {},
+    };
     for (const id of ids) col.valores[id] = (col.valores[id] ?? 0) + (p.piezas[id] ?? 0);
     mapa.set(p.semana, col);
   }
@@ -138,7 +142,12 @@ export function kpisPorSemana(datos: Datos): KpiSemana[] {
       const dias = r.tipo === 'completo' ? 7 : 3;
       const e = r.estatus;
       const intentos =
-        e.OK.pedidos + e.REAGENDO.pedidos + e.CANCELO.pedidos + e['SIN SERVICIO'].pedidos + e['SIN STOCK'].pedidos + e['FUERA DE COBERTURA'].pedidos;
+        e.OK.pedidos +
+        e.REAGENDO.pedidos +
+        e.CANCELO.pedidos +
+        e['SIN SERVICIO'].pedidos +
+        e['SIN STOCK'].pedidos +
+        e['FUERA DE COBERTURA'].pedidos;
       const piezas = Object.values(r.piezas).reduce((s, n) => s + n, 0);
       const reposicion = Object.entries(r.piezas).reduce((s, [id, n]) => s + n * (costo.get(id) ?? 0), 0);
       const publicidad = r.snapshot.gastoDiarioPublicidad * dias;
@@ -221,7 +230,10 @@ export function reemplazosPorProducto(datos: Datos): ResumenReemplazos {
   let costoEnvios = 0;
   let sinDetalle = 0;
   const filas = new Map<string, ReemplazoProducto>(
-    productos.map((p) => [p.id, { productoId: p.id, nombre: p.nombre, vendidas: 0, reemplazadas: 0, porcentaje: 0, costoPiezas: 0, semanas: [] }]),
+    productos.map((p) => [
+      p.id,
+      { productoId: p.id, nombre: p.nombre, vendidas: 0, reemplazadas: 0, porcentaje: 0, costoPiezas: 0, semanas: [] },
+    ]),
   );
   for (const r of reportes) {
     if (!r.reemplazosPorProducto) sinDetalle += 1;

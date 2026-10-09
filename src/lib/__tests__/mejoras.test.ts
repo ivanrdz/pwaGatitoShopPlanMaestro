@@ -14,7 +14,12 @@ const estatus = (ok: number) => {
   return e;
 };
 
-function semana(lunes: string, piezas: Record<string, number>, pedidos: number, reemp: Record<string, number> = {}): Reporte {
+function semana(
+  lunes: string,
+  piezas: Record<string, number>,
+  pedidos: number,
+  reemp: Record<string, number> = {},
+): Reporte {
   return {
     id: `${lunes}-completo`,
     semana: lunes,
@@ -40,7 +45,9 @@ function semana(lunes: string, piezas: Record<string, number>, pedidos: number, 
 
 const datos = (reportes: Reporte[], extra: Partial<Datos> = {}): Datos => ({
   ajustes: { ...ajustesIniciales(), inventarioDesde: '2026-09-01', gastoDiarioPublicidad: 700 },
-  productos: productosIniciales().map((p) => (p.id === 'encendedor' ? { ...p, stockInicial: 200, puntoReorden: 0 } : p)),
+  productos: productosIniciales().map((p) =>
+    p.id === 'encendedor' ? { ...p, stockInicial: 200, puntoReorden: 0 } : p,
+  ),
   reportes,
   compras: [],
   cobros: [],

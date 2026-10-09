@@ -64,7 +64,17 @@ function Marco({ titulo, descripcion, children, vacio }: Marco) {
   );
 }
 
-function Ejes({ ancho, y, ticks, formato }: { ancho: number; y: (v: number) => number; ticks: number[]; formato: (n: number) => string }) {
+function Ejes({
+  ancho,
+  y,
+  ticks,
+  formato,
+}: {
+  ancho: number;
+  y: (v: number) => number;
+  ticks: number[];
+  formato: (n: number) => string;
+}) {
   return (
     <g className="ejes" aria-hidden="true">
       {ticks.map((t) => (
@@ -91,7 +101,16 @@ interface BarrasProps {
 }
 
 /** Barras apiladas. Toca una barra para ver su detalle debajo. */
-export function BarrasApiladas({ titulo, descripcion, columnas, series, formato, formatoDetalle, alto = 200, total }: BarrasProps) {
+export function BarrasApiladas({
+  titulo,
+  descripcion,
+  columnas,
+  series,
+  formato,
+  formatoDetalle,
+  alto = 200,
+  total,
+}: BarrasProps) {
   const [ref, ancho] = useAncho<HTMLDivElement>();
   const [sel, setSel] = useState<number | null>(null);
   const activo = sel ?? columnas.length - 1;
@@ -126,7 +145,9 @@ export function BarrasApiladas({ titulo, descripcion, columnas, series, formato,
                     const alturaV = (v / max) * h;
                     const y = M.arriba + h - ((base + v) / max) * h;
                     base += v;
-                    return v > 0 ? <rect key={s.clave} x={x} y={y} width={anchoBarra} height={alturaV} fill={s.color} /> : null;
+                    return v > 0 ? (
+                      <rect key={s.clave} x={x} y={y} width={anchoBarra} height={alturaV} fill={s.color} />
+                    ) : null;
                   })}
                   {i % cadaCuanto === 0 && (
                     <text x={x + anchoBarra / 2} y={alto - 8} textAnchor="middle" className="eje-x">
@@ -190,11 +211,25 @@ interface LineaProps {
 }
 
 /** Línea con área suave. Opcionalmente una meta punteada. */
-export function Linea({ titulo, descripcion, puntos, color, formato, formatoDetalle, referencia, alto = 180, escalones }: LineaProps) {
+export function Linea({
+  titulo,
+  descripcion,
+  puntos,
+  color,
+  formato,
+  formatoDetalle,
+  referencia,
+  alto = 180,
+  escalones,
+}: LineaProps) {
   const [ref, ancho] = useAncho<HTMLDivElement>();
   const [sel, setSel] = useState<number | null>(null);
   const activo = sel ?? puntos.length - 1;
-  const { lo: minimo, hi, ticks } = escala(
+  const {
+    lo: minimo,
+    hi,
+    ticks,
+  } = escala(
     Math.min(0, ...puntos.map((p) => p.valor)),
     Math.max(referencia?.valor ?? 0, ...puntos.map((p) => p.valor)),
   );
@@ -236,8 +271,21 @@ export function Linea({ titulo, descripcion, puntos, color, formato, formatoDeta
             <path d={d} fill="none" stroke={color} strokeWidth={2.5} strokeLinejoin="round" />
             {puntos.map((pt, i) => (
               <g key={i} onClick={() => setSel(i)} onMouseEnter={() => setSel(i)}>
-                <rect x={x(i) - w / Math.max(1, puntos.length) / 2} y={M.arriba} width={w / Math.max(1, puntos.length)} height={h} fill="transparent" />
-                <circle cx={x(i)} cy={y(pt.valor)} r={i === activo ? 5 : 3} fill={i === activo ? color : 'var(--superficie)'} stroke={color} strokeWidth={2} />
+                <rect
+                  x={x(i) - w / Math.max(1, puntos.length) / 2}
+                  y={M.arriba}
+                  width={w / Math.max(1, puntos.length)}
+                  height={h}
+                  fill="transparent"
+                />
+                <circle
+                  cx={x(i)}
+                  cy={y(pt.valor)}
+                  r={i === activo ? 5 : 3}
+                  fill={i === activo ? color : 'var(--superficie)'}
+                  stroke={color}
+                  strokeWidth={2}
+                />
                 {i % cadaCuanto === 0 && (
                   <text x={x(i)} y={alto - 8} textAnchor="middle" className="eje-x">
                     {pt.etiqueta}

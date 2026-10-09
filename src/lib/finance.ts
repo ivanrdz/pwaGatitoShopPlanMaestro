@@ -103,7 +103,20 @@ export function pagosDeReportes(reportes: Reporte[]) {
     s[r.tipo] = r;
     porSemana.set(r.semana, s);
   }
-  const salida: Array<Omit<Pago, 'reposicion' | 'banco' | 'fondoInventario' | 'publicidad' | 'fijos' | 'sueldo' | 'ahorro' | 'deudaDespues' | 'previo'> & { reporte: Reporte }> = [];
+  const salida: Array<
+    Omit<
+      Pago,
+      | 'reposicion'
+      | 'banco'
+      | 'fondoInventario'
+      | 'publicidad'
+      | 'fijos'
+      | 'sueldo'
+      | 'ahorro'
+      | 'deudaDespues'
+      | 'previo'
+    > & { reporte: Reporte }
+  > = [];
   for (const [semana, { parcial, completo }] of [...porSemana].sort(([a], [b]) => a.localeCompare(b))) {
     if (parcial) {
       salida.push({
@@ -170,7 +183,12 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
         const conPremio = total * (1 + ev.compra.premio);
         deuda += conPremio;
         prestadoTotal += total;
-        movimientosBanco.push({ fecha: ev.fecha, concepto: 'Préstamo para inventario', monto: conPremio, saldo: deuda });
+        movimientosBanco.push({
+          fecha: ev.fecha,
+          concepto: 'Préstamo para inventario',
+          monto: conPremio,
+          saldo: deuda,
+        });
       } else {
         comprasPropias += total;
       }
@@ -195,11 +213,27 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
     const sueldo = (snap.sueldoMensual * p.dias) / 30;
     const ahorro = p.efectivo - banco - fondoInventario - publicidad - fijos - sueldo;
     if (banco > 0) {
-      movimientosBanco.push({ fecha: p.fecha, concepto: `Pago del ${p.tipo === 'jueves' ? 'jueves' : 'lunes'}`, monto: -banco, saldo: deuda });
+      movimientosBanco.push({
+        fecha: p.fecha,
+        concepto: `Pago del ${p.tipo === 'jueves' ? 'jueves' : 'lunes'}`,
+        monto: -banco,
+        saldo: deuda,
+      });
     }
     const { reporte: _omit, ...resto } = p;
     void _omit;
-    pagos.push({ ...resto, reposicion, banco, fondoInventario, publicidad, fijos, sueldo, ahorro, deudaDespues: deuda, previo });
+    pagos.push({
+      ...resto,
+      reposicion,
+      banco,
+      fondoInventario,
+      publicidad,
+      fijos,
+      sueldo,
+      ahorro,
+      deudaDespues: deuda,
+      previo,
+    });
   }
 
   const vigentes = pagos.filter((p) => !p.previo);
@@ -212,12 +246,17 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
   // Inventario de productos por caja.
   const desde = arranque;
   const ultimas = pagos.filter((p) => p.fecha >= sumarDias(pagos.at(-1)?.fecha ?? desde, -28));
-  const diasMuestra = Math.max(1, ultimas.reduce((s, p) => s + p.dias, 0));
+  const diasMuestra = Math.max(
+    1,
+    ultimas.reduce((s, p) => s + p.dias, 0),
+  );
   const inventario: EstadoProducto[] = productos
     .filter((p) => p.activo && p.porCaja)
     .map((producto) => {
-      const entradas = comprasVigentes
-        .reduce((s, c) => s + c.items.filter((i) => i.productoId === producto.id).reduce((a, i) => a + i.piezas, 0), 0);
+      const entradas = comprasVigentes.reduce(
+        (s, c) => s + c.items.filter((i) => i.productoId === producto.id).reduce((a, i) => a + i.piezas, 0),
+        0,
+      );
       const salidas = pagos.filter((p) => p.desde >= desde).reduce((s, p) => s + (p.piezas[producto.id] ?? 0), 0);
       const stock = producto.stockInicial + entradas - salidas;
       const porDia = ultimas.reduce((s, p) => s + (p.piezas[producto.id] ?? 0), 0) / diasMuestra;
@@ -248,8 +287,12 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
     const actual = semanasMap.get(r.semana);
     const usar = r.tipo === 'completo' || !actual?.tieneCompleto;
     const intentos =
-      r.estatus.OK.pedidos + r.estatus.CANCELO.pedidos + r.estatus['SIN SERVICIO'].pedidos +
-      r.estatus['SIN STOCK'].pedidos + r.estatus['FUERA DE COBERTURA'].pedidos + r.estatus.REAGENDO.pedidos;
+      r.estatus.OK.pedidos +
+      r.estatus.CANCELO.pedidos +
+      r.estatus['SIN SERVICIO'].pedidos +
+      r.estatus['SIN STOCK'].pedidos +
+      r.estatus['FUERA DE COBERTURA'].pedidos +
+      r.estatus.REAGENDO.pedidos;
     const diasCubiertos = r.tipo === 'completo' ? 7 : 3;
     const s: Semana = usar
       ? {
