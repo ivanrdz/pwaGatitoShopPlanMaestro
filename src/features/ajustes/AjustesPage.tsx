@@ -5,6 +5,7 @@ import { dinero, hoyIso, nuevoId } from '@/shared/lib/format';
 import { esRespaldoValido } from '@/data/respaldo';
 import type { Ajustes as TAjustes, Producto } from '@/domain/types';
 import { useTiendas } from '@/state/tiendas';
+import { SeccionCuenta } from './SeccionCuenta';
 import { TIENDA_PRINCIPAL } from '@/data/repositorio';
 
 export function AjustesPage() {
@@ -227,6 +228,8 @@ export function AjustesPage() {
       </section>
 
       <SeccionTiendas />
+
+      <SeccionCuenta />
 
       <section className="seccion" aria-labelledby="respaldo-titulo">
         <h2 id="respaldo-titulo">Respaldo</h2>

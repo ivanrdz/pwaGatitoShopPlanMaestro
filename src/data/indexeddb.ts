@@ -40,6 +40,12 @@ function abrir(id: string): Promise<IDBDatabase> {
   return conexion;
 }
 
+/** Cierra las conexiones abiertas (al cambiar de usuario o en pruebas). */
+export async function cerrarConexiones() {
+  for (const c of conexiones.values()) (await c).close();
+  conexiones.clear();
+}
+
 const promesa = <T>(req: IDBRequest<T>) =>
   new Promise<T>((resolve, reject) => {
     req.onsuccess = () => resolve(req.result);
