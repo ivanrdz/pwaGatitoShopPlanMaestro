@@ -1,4 +1,6 @@
-node_modules
 dist
-.DS_Store
+coverage
+dev-dist
 *.local
+.DS_Store
+node_modules

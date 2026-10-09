@@ -37,6 +37,12 @@ export default defineConfig({
       include: ['src/**/*.{ts,tsx}'],
       exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'src/main.tsx', 'src/sw.ts', 'src/vite-env.d.ts'],
       reporter: ['text', 'html'],
+      // La lógica de negocio y los datos no deben perder pruebas.
+      thresholds: {
+        'src/domain/**': { lines: 80, branches: 75 },
+        'src/data/**': { lines: 85, branches: 85 },
+        'src/features/indicadores/*.ts': { lines: 90 },
+      },
     },
   },
 });

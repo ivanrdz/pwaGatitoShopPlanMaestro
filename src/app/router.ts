@@ -1,9 +1,9 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, type RouteObject } from 'react-router';
 import { Layout } from './Layout';
 import { ErrorDeRuta } from './ErrorDeRuta';
 
 /** Cada pantalla se descarga solo cuando la abres (lazy loading). */
-export const router = createBrowserRouter([
+export const rutas: RouteObject[] = [
   {
     path: '/',
     Component: Layout,
@@ -30,4 +30,6 @@ export const router = createBrowserRouter([
       { path: '*', lazy: async () => ({ Component: (await import('./NoEncontrado')).NoEncontrado }) },
     ],
   },
-]);
+];
+
+export const router = createBrowserRouter(rutas);
