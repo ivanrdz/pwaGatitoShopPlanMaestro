@@ -38,6 +38,8 @@ export function AjustesPage() {
         <h1>Ajustes</h1>
       </div>
 
+      <SeccionCuenta />
+
       <section className="seccion" aria-labelledby="dinero-titulo">
         <h2 id="dinero-titulo">Tu dinero</h2>
         <p className="tenue">Se usan para los reportes que subas de aquí en adelante.</p>
@@ -228,8 +230,6 @@ export function AjustesPage() {
       </section>
 
       <SeccionTiendas />
-
-      <SeccionCuenta />
 
       <section className="seccion" aria-labelledby="respaldo-titulo">
         <h2 id="respaldo-titulo">Respaldo</h2>
