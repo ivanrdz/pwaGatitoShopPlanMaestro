@@ -1,11 +1,21 @@
-import { ESTATUS, type DiaReporte, type Estatus, type Producto, type ReporteParseado } from '@/domain/types';
+import {
+  ESTATUS,
+  type DiaReporte,
+  type Estatus,
+  type PedidoUnProducto,
+  type Producto,
+  type ReporteParseado,
+} from '@/domain/types';
 import { isoDate, sumarDias } from '@/shared/lib/format';
+import { totalesVacios, zonaDePedido } from '@/domain/zonas';
 
 const DIA_RE =
   /(LUNES|MARTES|MI[ÉE]RCOLES|JUEVES|VIERNES|S[ÁA]BADO)\s+(\d{1,2})\/(\d{1,2})\/(\d{4})\s+([\d,]+)(?![\d,/])\s+([\d,]+)(?![\d,/])/gi;
 const PRECIO_ESTATUS_RE = /\$\s?([\d,]+)\s+(OK|REAGENDO|CANCELO|REPETIDO|SIN STOCK|SIN SERVICIO|FUERA DE COBERTURA)\b/i;
 /** Costo que cobra el proveedor en el pedido: el número que va justo después del envío ("$69 94"). */
 const COSTO_FILA_RE = /^\s*(?:\$\s?[\d,]+|N\/A)\s+(\d+(?:\.\d+)?)(?![\d.,]|\s*(?:PZ|PIEZA))/i;
+/** Lo que cobra el repartidor por el envío, justo después del estatus ("OK $59"). */
+const ENVIO_FILA_RE = /^\s*\$\s?(\d+)/;
 const SOLO_RE = /SOLO\s+(?:PIDIO\s+)?(\d+)|(\d+)\s*PZZ/i;
 
 const numero = (s: string | undefined) => Number((s ?? '').replace(/[$,\s]/g, '')) || 0;
@@ -146,6 +156,8 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
   let reemplazos = 0;
   const reemplazosPorProducto: Record<string, number> = {};
   const piezasProveedor: Record<string, number> = {};
+  const zonas = totalesVacios();
+  const pedidosUnProducto: PedidoUnProducto[] = [];
   const porId = new Map(productos.map((p) => [p.id, p]));
   let filasOk = 0;
   const filas = [...cuerpo.matchAll(filaRe)];
@@ -154,9 +166,22 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
     const fin = i + 1 < filas.length ? (filas[i + 1].index ?? cuerpo.length) : cuerpo.length;
     const trozo = cuerpo.slice(inicio, fin);
     const pe = PRECIO_ESTATUS_RE.exec(trozo);
-    if (!pe || pe[2].toUpperCase() !== 'OK') return;
-    filasOk += 1;
+    if (!pe) return;
+    const estatusFila = pe[2].toUpperCase();
     const precio = numero(pe[1]);
+    // Zona de entrega de cada envío (repetidos no cuentan como envío).
+    if (estatusFila !== 'REPETIDO') {
+      const envioFila = Number(ENVIO_FILA_RE.exec(trozo.slice(pe.index + pe[0].length))?.[1] ?? 0);
+      const zona = zonaDePedido(trozo.slice(0, pe.index), estatusFila === 'OK' ? envioFila : null);
+      zonas[zona].intentos += 1;
+      if (estatusFila === 'OK') {
+        zonas[zona].entregados += 1;
+        zonas[zona].ventas += precio;
+        zonas[zona].envio += envioFila;
+      }
+    }
+    if (estatusFila !== 'OK') return;
+    filasOk += 1;
     if (precio === 0) reemplazos += 1;
 
     const diagonal = trozo.indexOf('/');
@@ -185,6 +210,21 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
             piezasProveedor[p.productoId!] = (piezasProveedor[p.productoId!] ?? 0) + p.cantidad;
         }
       }
+    }
+
+    // Pedidos de un solo producto: sirven para comparar lo cobrado contra tu lista de precios.
+    if (
+      precio > 0 &&
+      lista.length > 0 &&
+      lista.every((p) => p.productoId === lista[0].productoId) &&
+      lista[0].productoId
+    ) {
+      pedidosUnProducto.push({
+        productoId: lista[0].productoId,
+        piezas: lista.reduce((s, p) => s + p.cantidad, 0),
+        precio,
+        fecha: `${fila[3]}-${fila[2].padStart(2, '0')}-${fila[1].padStart(2, '0')}`,
+      });
     }
 
     for (const p of lista) {
@@ -216,6 +256,8 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
     reemplazos,
     reemplazosPorProducto,
     piezasProveedor,
+    zonas,
+    pedidosUnProducto,
     tienda,
     avisos,
   };

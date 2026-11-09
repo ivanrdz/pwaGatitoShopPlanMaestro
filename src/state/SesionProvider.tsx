@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { repositorioLocal } from '@/data/indexeddb';
 import { crearRepositorioNube } from '@/data/supabase';
+import { crearBandeja } from '@/data/bandeja';
 import { supabase } from '@/data/supabaseCliente';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { SesionCtx, type Sesion } from './sesion';
@@ -42,6 +43,8 @@ function SesionNube({ children }: { children: ReactNode }) {
         ? {
             repo: crearRepositorioNube(sb),
             correo: session?.user.email ?? null,
+            usuarioId,
+            bandeja: crearBandeja(sb, usuarioId),
             salir: async () => {
               await sb.auth.signOut();
             },
