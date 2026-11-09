@@ -21,9 +21,11 @@ export function CargadorProvider({ children }: { children: ReactNode }) {
   const [leyendo, setLeyendo] = useState(false);
   const [leidos, setLeidos] = useState<Leido[] | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const alGuardarRef = useRef<((guardados: string[]) => Promise<void>) | undefined>(undefined);
 
   const procesar = useCallback(
-    async (archivos: File[]) => {
+    async (archivos: File[], opciones?: { alGuardar?: (guardados: string[]) => Promise<void> }) => {
+      alGuardarRef.current = opciones?.alGuardar;
       const pdfs = archivos.filter((f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
       if (pdfs.length === 0) {
         setLeidos([{ nombreArchivo: archivos[0]?.name ?? 'archivo', error: 'Solo puedo leer reportes en PDF.' }]);
@@ -68,6 +70,8 @@ export function CargadorProvider({ children }: { children: ReactNode }) {
     setGuardando(true);
     try {
       await agregarReportes(validos.map((l) => ({ parseado: l.parseado!, nombreArchivo: l.nombreArchivo })));
+      await alGuardarRef.current?.(validos.map((l) => l.nombreArchivo)).catch((e) => console.error(e));
+      alGuardarRef.current = undefined;
       setLeidos(null);
       navigate('/');
     } finally {

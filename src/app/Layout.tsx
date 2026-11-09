@@ -4,6 +4,7 @@ import { CargadorProvider } from '@/features/reportes/CargadorProvider';
 import { useCargador } from '@/features/reportes/cargador';
 import { tomarArchivoCompartido } from '@/features/reportes/compartir';
 import { SelectorTienda } from '@/features/tiendas/SelectorTienda';
+import { BandejaAviso } from '@/features/reportes/BandejaAviso';
 import { CuentaLateral } from '@/features/auth/CuentaLateral';
 import { useTiendas } from '@/state/tiendas';
 import { rutaA, type Ruta } from './rutas';
@@ -72,6 +73,7 @@ export function Layout() {
         </nav>
         <main className="contenido">
           <SelectorTienda className="selector-movil" />
+          <BandejaAviso />
           <Outlet />
         </main>
       </div>

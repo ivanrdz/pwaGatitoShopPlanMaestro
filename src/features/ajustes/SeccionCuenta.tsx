@@ -16,7 +16,7 @@ async function reportesLocales(): Promise<number> {
 
 /** Cuenta de la nube: quién eres, cerrar sesión y subir lo que había en este dispositivo. */
 export function SeccionCuenta() {
-  const { repo, correo, salir } = useSesion();
+  const { repo, correo, salir, usuarioId } = useSesion();
   const [locales, setLocales] = useState(0);
   const [estado, setEstado] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
@@ -67,11 +67,41 @@ export function SeccionCuenta() {
         </div>
       )}
       {estado && <p role="status">{estado}</p>}
+      {usuarioId && <IdParaN8n usuarioId={usuarioId} />}
       <div className="botones">
         <button type="button" className="boton boton-secundario" onClick={() => void salir()}>
           Cerrar sesión
         </button>
       </div>
     </section>
+  );
+}
+
+/** Tu id de usuario, para configurar el flujo de n8n que deja los reportes en tu bandeja. */
+function IdParaN8n({ usuarioId }: { usuarioId: string }) {
+  const [copiado, setCopiado] = useState(false);
+  return (
+    <div className="id-n8n">
+      <h3>Reportes automáticos</h3>
+      <p className="tenue">
+        Para que los cortes lleguen solos desde tu correo, pon este ID en el flujo de n8n (ver README, sección «Reportes
+        automáticos»).
+      </p>
+      <div className="id-n8n-fila">
+        <code>{usuarioId}</code>
+        <button
+          type="button"
+          className="boton boton-secundario"
+          onClick={() =>
+            navigator.clipboard?.writeText(usuarioId).then(
+              () => setCopiado(true),
+              () => setCopiado(false),
+            )
+          }
+        >
+          {copiado ? 'Copiado' : 'Copiar'}
+        </button>
+      </div>
+    </div>
   );
 }

@@ -1,0 +1,58 @@
+{
+  "name": "Gatito: reportes del correo a la bandeja",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": { "item": [{ "mode": "everyX", "value": 10, "unit": "minutes" }] },
+        "simple": false,
+        "filters": { "q": "has:attachment filename:pdf newer_than:2d" },
+        "options": { "downloadAttachments": true, "dataPropertyAttachmentsPrefixName": "adjunto_" }
+      },
+      "id": "a1f1b9c2-0001-4d6e-9a10-000000000001",
+      "name": "Correo con PDF",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Un item por cada PDF de corte (el nombre trae GATITOSHOP o la fecha del corte).\nconst PATRON = /gatito/i;\nconst salida = [];\nfor (const item of $input.all()) {\n  for (const [clave, bin] of Object.entries(item.binary ?? {})) {\n    const nombre = bin.fileName ?? clave;\n    const esPdf = (bin.mimeType ?? '').includes('pdf') || nombre.toLowerCase().endsWith('.pdf');\n    if (!esPdf || !PATRON.test(nombre)) continue;\n    salida.push({ json: { nombre: nombre.replace(/[^\\w.\\-]+/g, '_') }, binary: { data: bin } });\n  }\n}\nreturn salida;"
+      },
+      "id": "a1f1b9c2-0002-4d6e-9a10-000000000002",
+      "name": "Separar PDFs de cortes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://TU-PROYECTO.supabase.co/storage/v1/object/bandeja/TU_USUARIO_ID/{{ $now.toFormat('yyyyMMdd-HHmmss') }}-{{ $json.nombre }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/pdf" },
+            { "name": "x-upsert", "value": "true" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "id": "a1f1b9c2-0003-4d6e-9a10-000000000003",
+      "name": "Subir a la bandeja de Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 0]
+    }
+  ],
+  "connections": {
+    "Correo con PDF": { "main": [[{ "node": "Separar PDFs de cortes", "type": "main", "index": 0 }]] },
+    "Separar PDFs de cortes": { "main": [[{ "node": "Subir a la bandeja de Supabase", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

@@ -1446,3 +1446,34 @@ p {
 .login-caja .enlace {
   justify-self: center;
 }
+
+/* ---------- Bandeja de reportes ---------- */
+.bandeja-aviso {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.bandeja-aviso .boton {
+  justify-self: start;
+}
+.id-n8n {
+  margin-top: 16px;
+  display: grid;
+  gap: 6px;
+}
+.id-n8n h3 {
+  font-size: 0.95rem;
+}
+.id-n8n-fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.id-n8n-fila code {
+  font-size: 0.85rem;
+  background: var(--papel);
+  padding: 8px 10px;
+  border-radius: 8px;
+  word-break: break-all;
+}

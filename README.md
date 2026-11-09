@@ -44,6 +44,35 @@ Al hacer commit, **Husky + lint-staged** corren ESLint y Prettier sobre los arch
 
 `.env.local` no se sube a git. En las pruebas, `.env.test` deja Supabase apagado para que nunca toquen tu base real.
 
+## Reportes automáticos (n8n)
+
+Los cortes pueden llegar solos desde tu correo: n8n deja cada PDF en una **bandeja privada** de Supabase Storage y la app te avisa «Llegaron 2 reportes». Los revisas con el lector de siempre y, al guardarlos, se borran de la bandeja.
+
+```
+Correo con el PDF ──▶ n8n ──▶ Supabase Storage: bandeja/<tu id>/<archivo>.pdf ──▶ la app los lee al abrirla
+```
+
+1. **Supabase:** en el SQL Editor ejecuta `supabase/migrations/20261108000000_bandeja_reportes.sql`. Crea la cubeta privada `bandeja`; cada usuario solo puede ver y borrar su propia carpeta.
+2. **Tu ID:** en la app, **Ajustes → Tu cuenta → Reportes automáticos → Copiar**.
+3. **n8n:** importa `automatizacion/n8n-bandeja-desde-correo.json` (menú ⋯ → _Import from file_) y ajusta:
+   - **Correo con PDF:** conecta tu cuenta de Gmail. El filtro busca correos con PDF de los últimos 2 días; ajústalo al remitente de tus cortes, por ejemplo `from:repartidor@correo.com has:attachment`.
+   - **Separar PDFs de cortes:** deja pasar los PDF cuyo nombre trae «gatito». Cambia `PATRON` si tus archivos se llaman distinto.
+   - **Subir a la bandeja de Supabase:** en la URL cambia `TU-PROYECTO` por tu proyecto y `TU_USUARIO_ID` por tu ID. En la credencial crea una **Custom Auth** con:
+     ```json
+     { "headers": { "Authorization": "Bearer TU_SERVICE_ROLE_KEY", "apikey": "TU_SERVICE_ROLE_KEY" } }
+     ```
+     La `service_role` está en Supabase → Project Settings → API keys. **Es secreta:** va solo en n8n, nunca en la app, en Vercel ni en git.
+4. Activa el flujo. Si usas otro proveedor de correo, cambia el primer nodo por _Email Trigger (IMAP)_; los otros dos sirven igual.
+
+**Probar sin n8n:** `automatizacion/subir-a-bandeja.sh` sube un PDF igual que el flujo:
+
+```bash
+SUPABASE_URL=https://TU-PROYECTO.supabase.co SUPABASE_SERVICE_ROLE_KEY=... GATITO_USUARIO_ID=... \
+  ./automatizacion/subir-a-bandeja.sh 10.10-GATITOSHOP.pdf
+```
+
+Cualquier otro servicio que reciba tus cortes (por ejemplo, el de WhatsApp) puede hacer el mismo `POST` a la bandeja.
+
 ## Publicar en Vercel
 
 Importa el repositorio en Vercel (detecta Vite solo) y agrega `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en **Settings → Environment Variables**. `vercel.json` ya trae las reescrituras para las rutas y los encabezados de caché del service worker.
