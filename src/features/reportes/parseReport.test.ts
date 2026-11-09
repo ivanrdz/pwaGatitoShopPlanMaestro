@@ -118,3 +118,16 @@ GATITOSHOP 28/9/2026 SOPORTE BOCINA BLUETHOOT Cliente B / 8100000002 / Calle 2 $
     expect(r.piezasProveedor).toEqual({});
   });
 });
+
+describe('zonas en el reporte', () => {
+  it('los envíos por zona suman los envíos del reporte y el envío suma la logística', () => {
+    const r = parseReportText(reporteCompleto, productosIniciales());
+    const z = Object.values(r.zonas!);
+    const intentos = Object.entries(r.estatus)
+      .filter(([k]) => k !== 'REPETIDO')
+      .reduce((s, [, v]) => s + v.pedidos, 0);
+    expect(z.reduce((s, x) => s + x.entregados, 0)).toBe(r.pedidosEntregados);
+    expect(z.reduce((s, x) => s + x.intentos, 0)).toBe(intentos);
+    expect(z.reduce((s, x) => s + x.envio, 0)).toBe(r.logistica);
+  });
+});

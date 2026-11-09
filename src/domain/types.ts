@@ -1,3 +1,4 @@
+import type { TotalesZona, Zona } from './zonas';
 export type Estatus = 'OK' | 'REAGENDO' | 'CANCELO' | 'REPETIDO' | 'SIN STOCK' | 'SIN SERVICIO' | 'FUERA DE COBERTURA';
 
 export const ESTATUS: Estatus[] = [
@@ -92,6 +93,8 @@ export interface ReporteParseado {
    * No salen de tu inventario ni se le deben al banco. Falta en reportes guardados por versiones anteriores.
    */
   piezasProveedor?: Record<string, number>;
+  /** Envíos, entregas, ventas y costo de envío por zona. Falta en reportes de versiones anteriores. */
+  zonas?: Record<Zona, TotalesZona>;
   /** Nombre de la tienda que trae el reporte. */
   tienda: string;
   avisos: string[];
