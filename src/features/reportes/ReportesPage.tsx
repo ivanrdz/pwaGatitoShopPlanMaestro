@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ListaCobros } from './CobrosDeMenos';
 import { useApp } from '@/state/appData';
 import { useCargador } from '@/features/reportes/cargador';
 import { Dialogo } from '@/shared/ui/Dialogo';
@@ -233,6 +234,8 @@ function DetalleReporte({ reporte, alCerrar }: { reporte: Reporte; alCerrar: () 
           </li>
         ))}
       </ul>
+
+      <ListaCobros reporte={reporte} productos={datos.productos} />
 
       <h3 className="subtitulo">Valores de este periodo</h3>
       <p className="tenue">
