@@ -6,6 +6,7 @@ import { esRespaldoValido } from '@/data/respaldo';
 import type { Ajustes as TAjustes, Producto } from '@/domain/types';
 import { useTiendas } from '@/state/tiendas';
 import { SeccionCuenta } from './SeccionCuenta';
+import { escribirPrecios, leerPrecios } from '@/domain/descuentos';
 import { TIENDA_PRINCIPAL } from '@/data/repositorio';
 
 export function AjustesPage() {
@@ -222,6 +223,7 @@ export function AjustesPage() {
               puntoReorden: 0,
               diasEntrega: 7,
               activo: true,
+              precios: [],
             })
           }
         >
@@ -279,6 +281,7 @@ export function AjustesPage() {
 }
 
 function EditorProducto({ producto, alGuardar }: { producto: Producto; alGuardar: (p: Producto) => Promise<void> }) {
+  const [textoPrecios, setTextoPrecios] = useState(() => escribirPrecios(producto.precios ?? []));
   const [p, setP] = useState(producto);
   const cambiado = JSON.stringify(p) !== JSON.stringify(producto);
   return (
@@ -337,6 +340,15 @@ function EditorProducto({ producto, alGuardar }: { producto: Producto; alGuardar
           </>
         )}
       </div>
+      <CampoTexto
+        etiqueta="Precios de venta"
+        value={textoPrecios}
+        alCambiar={(v) => {
+          setTextoPrecios(v);
+          setP({ ...p, precios: leerPrecios(v) });
+        }}
+        ayuda="Piezas = precio, separados por coma (envío incluido si lo cobras). Ej.: 1 = 229, 2 = 399. Sirve para avisarte de pedidos cobrados de menos."
+      />
       <CampoTexto
         etiqueta="Cómo aparece en el reporte"
         value={p.patrones.join(', ')}
