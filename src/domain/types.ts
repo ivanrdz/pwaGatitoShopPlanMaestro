@@ -1,3 +1,4 @@
+import type { TotalesZona, Zona } from './zonas';
 export type Estatus = 'OK' | 'REAGENDO' | 'CANCELO' | 'REPETIDO' | 'SIN STOCK' | 'SIN SERVICIO' | 'FUERA DE COBERTURA';
 
 export const ESTATUS: Estatus[] = [
@@ -27,6 +28,13 @@ export interface Producto {
   /** Días que tarda tu proveedor desde que pides hasta que tienes la caja. */
   diasEntrega: number;
   activo: boolean;
+  /** Tu lista de precios al cliente por cantidad (envío incluido si lo cobras). Para detectar cobros de menos. */
+  precios: PrecioVenta[];
+}
+
+export interface PrecioVenta {
+  piezas: number;
+  precio: number;
 }
 
 export interface GastoFijo {
@@ -92,6 +100,13 @@ export interface ReporteParseado {
    * No salen de tu inventario ni se le deben al banco. Falta en reportes guardados por versiones anteriores.
    */
   piezasProveedor?: Record<string, number>;
+  /** Envíos, entregas, ventas y costo de envío por zona. Falta en reportes de versiones anteriores. */
+  zonas?: Record<Zona, TotalesZona>;
+  /**
+   * Pedidos entregados de un solo producto: piezas y precio cobrado (sin datos del cliente).
+   * Sirven para detectar cobros por debajo de tu lista de precios. Falta en reportes de versiones anteriores.
+   */
+  pedidosUnProducto?: PedidoUnProducto[];
   /** Nombre de la tienda que trae el reporte. */
   tienda: string;
   avisos: string[];
@@ -132,4 +147,12 @@ export interface Datos {
 export interface Tienda {
   id: string;
   nombre: string;
+}
+
+export interface PedidoUnProducto {
+  productoId: string;
+  piezas: number;
+  precio: number;
+  /** AAAA-MM-DD */
+  fecha: string;
 }

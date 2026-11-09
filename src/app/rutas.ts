@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-export type Ruta = 'inicio' | 'indicadores' | 'reportes' | 'inventario' | 'banco' | 'ajustes';
+export type Ruta = 'inicio' | 'indicadores' | 'reportes' | 'inventario' | 'contabilidad' | 'banco' | 'ajustes';
 
 export const rutaA = (r: Ruta) => (r === 'inicio' ? '/' : `/${r}`);
 
