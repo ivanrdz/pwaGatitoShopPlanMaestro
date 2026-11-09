@@ -4,13 +4,15 @@ import { kpisPorSemana, semanasParaMeta, type KpiSemana } from '@/domain/series'
 import { dinero, entero, rangoSemana } from '@/shared/lib/format';
 import { Simulador } from '@/features/indicadores/Simulador';
 import { Embudo } from '@/features/indicadores/Embudo';
+import { Zonas } from '@/features/indicadores/Zonas';
 
-type Vista = 'semana' | 'embudo' | 'simulador';
+type Vista = 'semana' | 'embudo' | 'zonas' | 'simulador';
 
 function Cabeza({ vista, setVista }: { vista: Vista; setVista: (v: Vista) => void }) {
   const vistas: Array<[Vista, string]> = [
     ['semana', 'Por semana'],
     ['embudo', 'Embudo'],
+    ['zonas', 'Zonas'],
     ['simulador', 'Simulador'],
   ];
   return (
@@ -213,7 +215,7 @@ export function IndicadoresPage() {
     return (
       <>
         <Cabeza vista={vista} setVista={setVista} />
-        {vista === 'embudo' ? <Embudo /> : <Simulador />}
+        {vista === 'embudo' ? <Embudo /> : vista === 'zonas' ? <Zonas /> : <Simulador />}
       </>
     );
   }

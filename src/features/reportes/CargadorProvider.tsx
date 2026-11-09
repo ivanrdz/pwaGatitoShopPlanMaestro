@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { Dialogo } from '@/shared/ui/Dialogo';
 import { idReporte, useApp } from '@/state/appData';
 import { CargadorCtx } from './cargador';
+import { AvisoCobros } from './CobrosDeMenos';
 import { parseReportText } from '@/features/reportes/parseReport';
 import type { ReporteParseado } from '@/domain/types';
 import { dinero, entero, rangoSemana } from '@/shared/lib/format';
@@ -152,6 +153,7 @@ export function CargadorProvider({ children }: { children: ReactNode }) {
                           de tienda para subirlo; no se guardará aquí.
                         </p>
                       )}
+                      <AvisoCobros parseado={l.parseado} productos={datos.productos} />
                       {l.parseado.avisos.map((a) => (
                         <p key={a} className="aviso aviso-chico">
                           {a}
