@@ -1,4 +1,11 @@
-import { ESTATUS, type DiaReporte, type Estatus, type Producto, type ReporteParseado } from '@/domain/types';
+import {
+  ESTATUS,
+  type DiaReporte,
+  type Estatus,
+  type PedidoUnProducto,
+  type Producto,
+  type ReporteParseado,
+} from '@/domain/types';
 import { isoDate, sumarDias } from '@/shared/lib/format';
 import { totalesVacios, zonaDePedido } from '@/domain/zonas';
 
@@ -150,6 +157,7 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
   const reemplazosPorProducto: Record<string, number> = {};
   const piezasProveedor: Record<string, number> = {};
   const zonas = totalesVacios();
+  const pedidosUnProducto: PedidoUnProducto[] = [];
   const porId = new Map(productos.map((p) => [p.id, p]));
   let filasOk = 0;
   const filas = [...cuerpo.matchAll(filaRe)];
@@ -204,6 +212,21 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
       }
     }
 
+    // Pedidos de un solo producto: sirven para comparar lo cobrado contra tu lista de precios.
+    if (
+      precio > 0 &&
+      lista.length > 0 &&
+      lista.every((p) => p.productoId === lista[0].productoId) &&
+      lista[0].productoId
+    ) {
+      pedidosUnProducto.push({
+        productoId: lista[0].productoId,
+        piezas: lista.reduce((s, p) => s + p.cantidad, 0),
+        precio,
+        fecha: `${fila[3]}-${fila[2].padStart(2, '0')}-${fila[1].padStart(2, '0')}`,
+      });
+    }
+
     for (const p of lista) {
       if (p.productoId && precio === 0) {
         reemplazosPorProducto[p.productoId] = (reemplazosPorProducto[p.productoId] ?? 0) + p.cantidad;
@@ -234,6 +257,7 @@ export function parseReportText(raw: string, productos: Producto[]): ReportePars
     reemplazosPorProducto,
     piezasProveedor,
     zonas,
+    pedidosUnProducto,
     tienda,
     avisos,
   };

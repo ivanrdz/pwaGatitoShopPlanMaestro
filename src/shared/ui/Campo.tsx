@@ -41,16 +41,27 @@ export function CampoNumero({ etiqueta, valor, alCambiar, prefijo, sufijo, ayuda
 interface TextoProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
   etiqueta: string;
   alCambiar: (v: string) => void;
+  ayuda?: string;
 }
 
-export function CampoTexto({ etiqueta, alCambiar, ...resto }: TextoProps) {
+export function CampoTexto({ etiqueta, alCambiar, ayuda, ...resto }: TextoProps) {
   const id = useId();
   return (
     <div className="campo">
       <label htmlFor={id}>{etiqueta}</label>
       <div className="campo-caja">
-        <input id={id} onChange={(e) => alCambiar(e.target.value)} {...resto} />
+        <input
+          id={id}
+          onChange={(e) => alCambiar(e.target.value)}
+          aria-describedby={ayuda ? `${id}-ayuda` : undefined}
+          {...resto}
+        />
       </div>
+      {ayuda && (
+        <p id={`${id}-ayuda`} className="campo-ayuda">
+          {ayuda}
+        </p>
+      )}
     </div>
   );
 }

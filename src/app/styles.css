@@ -707,6 +707,12 @@ p {
 .lista-simple li:first-child {
   border-top: 0;
 }
+.lista-simple li {
+  gap: 12px;
+}
+.lista-simple .num {
+  white-space: nowrap;
+}
 
 .lista-leidos {
   list-style: none;

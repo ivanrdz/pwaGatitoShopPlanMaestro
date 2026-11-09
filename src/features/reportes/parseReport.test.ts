@@ -131,3 +131,17 @@ describe('zonas en el reporte', () => {
     expect(z.reduce((s, x) => s + x.envio, 0)).toBe(r.logistica);
   });
 });
+
+describe('pedidos de un solo producto', () => {
+  it('guarda piezas, precio y fecha; omite reemplazos y pedidos con varios productos', () => {
+    const r = parseReportText(reporteCompleto, productosIniciales());
+    const pedidos = r.pedidosUnProducto ?? [];
+    expect(pedidos.length).toBeGreaterThan(0);
+    for (const p of pedidos) {
+      expect(p.precio).toBeGreaterThan(0);
+      expect(p.fecha).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(p.piezas).toBeGreaterThan(0);
+    }
+    expect(pedidos.length).toBeLessThanOrEqual(r.pedidosEntregados);
+  });
+});
