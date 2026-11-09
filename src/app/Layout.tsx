@@ -8,11 +8,17 @@ import { CuentaLateral } from '@/features/auth/CuentaLateral';
 import { useTiendas } from '@/state/tiendas';
 import { rutaA, type Ruta } from './rutas';
 
-const NAV: Array<{ ruta: Ruta; texto: string; icono: string }> = [
+const NAV: Array<{ ruta: Ruta; texto: string; corto?: string; icono: string }> = [
   { ruta: 'inicio', texto: 'Inicio', icono: 'M4 11l8-7 8 7v9a1 1 0 01-1 1h-5v-6h-4v6H5a1 1 0 01-1-1z' },
   { ruta: 'indicadores', texto: 'Indicadores', icono: 'M4 20V10M10 20V4M16 20v-7M22 20H2' },
   { ruta: 'reportes', texto: 'Reportes', icono: 'M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6' },
   { ruta: 'inventario', texto: 'Inventario', icono: 'M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10' },
+  {
+    ruta: 'contabilidad',
+    texto: 'Contabilidad',
+    corto: 'Cuentas',
+    icono: 'M6 3h12v18H6zM9 7h6M9 11h6M9 15h3',
+  },
   { ruta: 'banco', texto: 'Banco', icono: 'M3 10l9-6 9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18' },
   { ruta: 'ajustes', texto: 'Ajustes', icono: 'M4 7h10M18 7h2M4 17h4M12 17h8M14 4v6M8 14v6' },
 ];
@@ -63,7 +69,8 @@ export function Layout() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <span>{n.texto}</span>
+                  <span className="nav-texto">{n.texto}</span>
+                  {n.corto && <span className="nav-corto">{n.corto}</span>}
                 </NavLink>
               </li>
             ))}
