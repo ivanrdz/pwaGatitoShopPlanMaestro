@@ -18,6 +18,10 @@ export const productosIniciales = (): Producto[] => [
     puntoReorden: 0,
     diasEntrega: 7,
     activo: true,
+    precios: [
+      { piezas: 1, precio: 199 },
+      { piezas: 2, precio: 299 },
+    ],
   },
   {
     id: 'bocina',
@@ -31,6 +35,10 @@ export const productosIniciales = (): Producto[] => [
     puntoReorden: 0,
     diasEntrega: 7,
     activo: true,
+    precios: [
+      { piezas: 1, precio: 229 },
+      { piezas: 2, precio: 399 },
+    ],
   },
   {
     id: 'ventosa',
@@ -44,6 +52,10 @@ export const productosIniciales = (): Producto[] => [
     puntoReorden: 0,
     diasEntrega: 7,
     activo: true,
+    precios: [
+      { piezas: 1, precio: 199 },
+      { piezas: 2, precio: 299 },
+    ],
   },
   {
     id: 'encendedor',
@@ -57,6 +69,11 @@ export const productosIniciales = (): Producto[] => [
     puntoReorden: 0,
     diasEntrega: 7,
     activo: true,
+    precios: [
+      { piezas: 1, precio: 179 },
+      { piezas: 2, precio: 229 },
+      { piezas: 4, precio: 428 },
+    ],
   },
   {
     id: 'masajeador',
@@ -70,6 +87,10 @@ export const productosIniciales = (): Producto[] => [
     puntoReorden: 0,
     diasEntrega: 7,
     activo: true,
+    precios: [
+      { piezas: 1, precio: 149 },
+      { piezas: 2, precio: 249 },
+    ],
   },
 ];
 
@@ -105,5 +126,6 @@ export const completarProducto = (p: Partial<Producto> & Pick<Producto, 'id' | '
   puntoReorden: 0,
   diasEntrega: 7,
   activo: true,
+  precios: [],
   ...p,
 });

@@ -8,6 +8,7 @@ import { dinero, entero, fechaCorta, hoyIso, corto, piezasCorto } from '@/shared
 import { useIr, type Ruta } from '@/app/rutas';
 import { BarrasApiladas, Linea } from '@/shared/ui/Graficas';
 import { SOBRES, repartoPorSemana, reservaEnElTiempo } from '@/domain/series';
+import type { SueldoMes } from '@/domain/finance';
 
 const colorSobre = (c: string) => `var(--${c})`;
 
@@ -140,6 +141,7 @@ export function InicioPage() {
                   : `Meta: ${dinero(libro.meta)} para comprar las cajas sin pedir prestado.`}
               </p>
             </article>
+            {libro.sueldoMes && <TarjetaSueldo sueldo={libro.sueldoMes} />}
           </div>
         </section>
 
@@ -250,5 +252,48 @@ export function InicioPage() {
         <CampoNumero etiqueta="Monto cobrado" prefijo="$" valor={cobro ?? 0} alCambiar={setCobro} min={0} />
       </Dialogo>
     </div>
+  );
+}
+
+const MESES = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+];
+
+/** Cuánto te has pagado este mes contra tu sueldo mensual. */
+function TarjetaSueldo({ sueldo }: { sueldo: SueldoMes }) {
+  const avance = sueldo.meta > 0 ? Math.min(1, sueldo.pagado / sueldo.meta) : 0;
+  const nombreMes = MESES[Number(sueldo.mes.slice(5, 7)) - 1] ?? sueldo.mes;
+  return (
+    <article className="tile tile-meta">
+      <h3>Tu sueldo de {nombreMes}</h3>
+      <p className="tile-monto num">{dinero(sueldo.pagado)}</p>
+      <div
+        className="meta-barra"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(avance * 100)}
+        aria-label="Avance de tu sueldo del mes"
+      >
+        <span style={{ width: `${avance * 100}%` }} />
+      </div>
+      <p className="tenue">
+        De {dinero(sueldo.meta)} al mes.
+        {sueldo.pendiente >= 1
+          ? ` Van ${dinero(sueldo.pendiente)} pendientes: se pagan primero con lo que sobre de los siguientes pagos.`
+          : ' Vas al corriente.'}
+      </p>
+    </article>
   );
 }
