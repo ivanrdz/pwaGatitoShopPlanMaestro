@@ -26,7 +26,11 @@ export interface Pago {
   fondoInventario: number;
   publicidad: number;
   fijos: number;
+  /** Lo que te pagas en este pago: lo que sobra después de los gastos del negocio, hasta tu meta. */
   sueldo: number;
+  /** Lo que te tocaba: los días de este pago más lo que quedó pendiente en el mes. */
+  sueldoMeta: number;
+  /** Ahorro de Gatito. Negativo solo si el pago no alcanzó para los gastos del negocio (faltante real). */
   ahorro: number;
   deudaDespues: number;
   /** Es de antes del arranque: se muestra, pero no mueve saldos. */
@@ -87,6 +91,17 @@ export interface Libro {
   meta: number;
   inventario: EstadoProducto[];
   alertas: Alerta[];
+  /** Tu sueldo del mes del último pago: cuánto llevas contra tu meta mensual. */
+  sueldoMes: SueldoMes | null;
+}
+
+export interface SueldoMes {
+  /** AAAA-MM */
+  mes: string;
+  pagado: number;
+  meta: number;
+  /** Lo que te tocaba hasta el último pago y aún no se ha podido pagar. */
+  pendiente: number;
 }
 
 const restar = (a: Record<string, number>, b: Record<string, number>) => {
@@ -116,6 +131,7 @@ export function pagosDeReportes(reportes: Reporte[]) {
       | 'publicidad'
       | 'fijos'
       | 'sueldo'
+      | 'sueldoMeta'
       | 'ahorro'
       | 'deudaDespues'
       | 'previo'
@@ -185,6 +201,9 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
   let comprasPropias = 0;
   const pagos: Pago[] = [];
   const movimientosBanco: MovimientoBanco[] = [];
+  // Sueldo que no alcanzó en un pago y se repone con los siguientes del mismo mes.
+  let sueldoPendiente = 0;
+  let mesPendiente = '';
   if (deuda > 0) movimientosBanco.push({ fecha: arranque, concepto: 'Deuda al arrancar', monto: deuda, saldo: deuda });
 
   for (const ev of eventos) {
@@ -221,8 +240,17 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
     const fondoInventario = reposicion - cubierto;
     const publicidad = snap.gastoDiarioPublicidad * p.dias;
     const fijos = (snap.fijosMensual * p.dias) / 30;
-    const sueldo = (snap.sueldoMensual * p.dias) / 30;
-    const ahorro = p.efectivo - banco - fondoInventario - publicidad - fijos - sueldo;
+    // Primero el negocio (banco, inventario, publicidad, fijos); tu sueldo es lo que sobra, hasta tu meta.
+    const mes = p.fecha.slice(0, 7);
+    if (mes !== mesPendiente) {
+      sueldoPendiente = 0;
+      mesPendiente = mes;
+    }
+    const sueldoMeta = (snap.sueldoMensual * p.dias) / 30 + (previo ? 0 : sueldoPendiente);
+    const disponible = p.efectivo - banco - fondoInventario - publicidad - fijos;
+    const sueldo = Math.min(sueldoMeta, Math.max(0, disponible));
+    const ahorro = disponible - sueldo;
+    if (!previo) sueldoPendiente = sueldoMeta - sueldo;
     if (banco > 0) {
       movimientosBanco.push({
         fecha: p.fecha,
@@ -241,6 +269,7 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
       publicidad,
       fijos,
       sueldo,
+      sueldoMeta,
       ahorro,
       deudaDespues: deuda,
       previo,
@@ -361,9 +390,10 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
     alertas.push({
       id: 'ahorro-negativo',
       tono: 'atencion',
-      texto: 'El último pago no alcanzó para todo. La diferencia sale de la reserva de Gatito.',
+      texto: 'El último pago no alcanzó ni para los gastos del negocio. La diferencia sale de la reserva de Gatito.',
     });
   }
+  const sueldoMes = calcularSueldoMes(vigentes, ajustes.sueldoMensual);
   const ultimaSemana = reportes.reduce((m, r) => (r.semana > m ? r.semana : m), '');
   const reporteSemana =
     reportes.find((r) => r.semana === ultimaSemana && r.tipo === 'completo') ??
@@ -403,5 +433,20 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
     meta,
     inventario,
     alertas,
+    sueldoMes,
+  };
+}
+
+/** Cuánto te has pagado en el mes del último pago, contra tu sueldo mensual. */
+function calcularSueldoMes(vigentes: Pago[], sueldoMensual: number): SueldoMes | null {
+  const ultimo = vigentes.at(-1);
+  if (!ultimo) return null;
+  const mes = ultimo.fecha.slice(0, 7);
+  const delMes = vigentes.filter((p) => p.fecha.startsWith(mes));
+  return {
+    mes,
+    pagado: delMes.reduce((s, p) => s + p.sueldo, 0),
+    meta: sueldoMensual,
+    pendiente: Math.max(0, ultimo.sueldoMeta - ultimo.sueldo),
   };
 }
