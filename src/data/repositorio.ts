@@ -63,7 +63,14 @@ export function normalizarDatos(
   const base = new Map(productosIniciales().map((p) => [p.id, p]));
   productos = productos.map((p) => {
     const d = base.get(p.id);
-    return d ? { ...p, patrones: [...new Set([...p.patrones, ...d.patrones])] } : p;
+    return d
+      ? {
+          ...p,
+          patrones: [...new Set([...p.patrones, ...d.patrones])],
+          // Productos guardados antes de la lista de precios reciben la de Gatito.
+          precios: p.precios?.length ? p.precios : d.precios,
+        }
+      : p;
   });
   const orden = new Map(productosIniciales().map((p, i) => [p.id, i]));
   productos.sort((a, b) => (orden.get(a.id) ?? 99) - (orden.get(b.id) ?? 99));

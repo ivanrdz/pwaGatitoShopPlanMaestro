@@ -1,5 +1,6 @@
 import type { Datos, Producto, Reporte } from '@/domain/types';
 import { hoyIso, sumarDias } from '@/shared/lib/format';
+import { cobrosDeMenos } from './descuentos';
 
 export type TipoPago = 'jueves' | 'lunes' | 'semana';
 
@@ -364,6 +365,19 @@ export function calcularLibro(datos: Datos, hoy: string = hoyIso()): Libro {
     });
   }
   const ultimaSemana = reportes.reduce((m, r) => (r.semana > m ? r.semana : m), '');
+  const reporteSemana =
+    reportes.find((r) => r.semana === ultimaSemana && r.tipo === 'completo') ??
+    reportes.find((r) => r.semana === ultimaSemana);
+  const deMenos = reporteSemana ? cobrosDeMenos(reporteSemana, productos) : [];
+  if (deMenos.length > 0) {
+    const total = deMenos.reduce((s, c) => s + c.diferencia, 0);
+    alertas.push({
+      id: 'cobros-de-menos',
+      tono: 'atencion',
+      texto: `La última semana ${deMenos.length === 1 ? 'hubo 1 pedido cobrado' : `hubo ${deMenos.length} pedidos cobrados`} por debajo de tu lista de precios: ${Math.round(total)} pesos de menos. Revisa el detalle del reporte.`,
+      ir: 'reportes',
+    });
+  }
   const desconocidos = reportes
     .filter((r) => r.semana === ultimaSemana)
     .flatMap((r) => r.noReconocidos.map((n) => n.texto.toLowerCase()));
